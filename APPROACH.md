@@ -16,6 +16,8 @@ Build a frontend-first weather app with a minimal Next.js API layer, but with st
 8. Enforce token-gated app access + per-IP rate limit.
 9. Deploy target is Render with CI pipeline.
 10. Prioritize strict single responsibility per file/component.
+11. Use `Inter` as the application typography baseline.
+12. Use Erik Flowers `weather-icons` for all weather icon rendering.
 
 ## 3. Architecture (Hexagonal)
 

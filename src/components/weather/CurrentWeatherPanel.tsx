@@ -1,6 +1,6 @@
 import type { WeatherResponse } from '@/types/weather';
 
-import { resolveWeatherIconGlyph } from './weatherIconGlyph';
+import { resolveWeatherIconClass } from './weatherIconClass';
 
 type CurrentWeatherPanelProps = {
   weather: WeatherResponse;
@@ -23,8 +23,11 @@ export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
           <p className="current-description">{weather.current.description}</p>
         </div>
         <div className="current-temperature">
-          <span className="current-icon" aria-hidden="true">
-            {resolveWeatherIconGlyph(weather.current.icon)}
+          <span className="current-icon">
+            <i
+              className={`wi ${resolveWeatherIconClass(weather.current.icon)}`}
+              aria-hidden="true"
+            />
           </span>
           <p className="current-temp">
             {weather.current.temperature}°{unitSymbol(weather.units)}

@@ -1,17 +1,13 @@
 import type { Metadata } from 'next';
-import { DM_Sans, Fraunces } from 'next/font/google';
+import { Inter } from 'next/font/google';
 
 import { AppProviders } from '@/components/shared/AppProviders';
+import 'weather-icons/css/weather-icons.min.css';
 import '@/styles/globals.css';
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-body',
-});
-
-const fraunces = Fraunces({
-  subsets: ['latin'],
-  variable: '--font-display',
 });
 
 export const metadata: Metadata = {
@@ -26,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${dmSans.variable} ${fraunces.variable}`}>
+      <body className={inter.variable}>
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

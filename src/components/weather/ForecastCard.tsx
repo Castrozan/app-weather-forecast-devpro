@@ -1,5 +1,5 @@
 import type { ForecastDay, TemperatureUnit } from '@/types/weather';
-import { resolveWeatherIconGlyph } from './weatherIconGlyph';
+import { resolveWeatherIconClass } from './weatherIconClass';
 
 type ForecastCardProps = {
   forecast: ForecastDay;
@@ -14,8 +14,8 @@ export const ForecastCard = ({ forecast, units }: ForecastCardProps) => {
   return (
     <article className="forecast-card">
       <h4 className="forecast-label">{forecast.label}</h4>
-      <span className="forecast-icon" aria-hidden="true">
-        {resolveWeatherIconGlyph(forecast.icon)}
+      <span className="forecast-icon">
+        <i className={`wi ${resolveWeatherIconClass(forecast.icon)}`} aria-hidden="true" />
       </span>
       <p className="forecast-description">{forecast.description}</p>
       <div className="forecast-minmax-grid">
