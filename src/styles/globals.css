@@ -356,20 +356,20 @@ input[type='radio']:focus-visible {
   z-index: 2;
   display: grid;
   gap: 12px;
+  will-change: transform, filter;
   transition:
-    opacity 220ms ease,
-    filter 220ms ease,
-    transform 220ms ease;
+    filter 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .weather-content-visible {
-  animation: weather-content-enter 320ms ease both;
+  animation: weather-content-enter 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .weather-content-loading {
-  opacity: 0.28;
-  filter: saturate(0.85) blur(1px);
-  transform: scale(0.995);
+  opacity: 0;
+  filter: saturate(0.86) blur(2px);
+  transform: scale(0.992);
 }
 
 .weather-skeleton-layer {
@@ -381,10 +381,11 @@ input[type='radio']:focus-visible {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  background: transparent;
 }
 
 .weather-skeleton-overlay .weather-skeleton {
-  animation: skeleton-overlay-enter 180ms ease both;
+  animation: skeleton-overlay-enter 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .weather-skeleton {
@@ -392,12 +393,15 @@ input[type='radio']:focus-visible {
   z-index: 1;
   display: grid;
   gap: 12px;
+  will-change: transform, filter;
 }
 
-.weather-skeleton-current,
+.current-weather.weather-skeleton-current,
 .weather-skeleton-forecast .forecast-card {
-  border-color: rgba(176, 229, 255, 0.16);
-  background: linear-gradient(180deg, rgba(11, 33, 56, 0.58), rgba(7, 23, 39, 0.4));
+  border-color: #3a6f98;
+  background: linear-gradient(180deg, #133a5f, #0f3353);
+  backdrop-filter: none;
+  box-shadow: none;
 }
 
 .weather-skeleton-copy {
@@ -411,14 +415,9 @@ input[type='radio']:focus-visible {
 .weather-skeleton-icon-sm {
   display: block;
   border-radius: 10px;
-  background: linear-gradient(
-    100deg,
-    rgba(170, 220, 248, 0.12) 0%,
-    rgba(221, 243, 255, 0.42) 34%,
-    rgba(170, 220, 248, 0.12) 64%
-  );
+  background: linear-gradient(100deg, #4f7ca1 0%, #84aace 34%, #4f7ca1 64%);
   background-size: 220% 100%;
-  animation: skeleton-shimmer 1.25s ease-in-out infinite;
+  animation: skeleton-shimmer 1.55s ease-in-out infinite;
 }
 
 .skeleton-line-kicker {
@@ -448,6 +447,15 @@ input[type='radio']:focus-visible {
   width: 110px;
   height: 110px;
   border-radius: 999px;
+  border-color: #3a6f98;
+  box-shadow: none;
+}
+
+.current-icon.weather-skeleton-icon,
+.forecast-icon.weather-skeleton-icon-sm {
+  border-color: #3a6f98;
+  background: linear-gradient(180deg, #1d527d, #173f62);
+  box-shadow: none;
 }
 
 .weather-skeleton-stat {
@@ -484,6 +492,8 @@ input[type='radio']:focus-visible {
   width: 64px;
   height: 64px;
   border-radius: 999px;
+  border-color: #3a6f98;
+  box-shadow: none;
 }
 
 .skeleton-line-small {
@@ -772,22 +782,26 @@ input[type='radio']:focus-visible {
 @keyframes weather-content-enter {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(10px) scale(0.994);
+    filter: blur(2px) saturate(0.92);
   }
 
   to {
     opacity: 1;
     transform: translateY(0);
+    filter: blur(0) saturate(1);
   }
 }
 
 @keyframes skeleton-overlay-enter {
   from {
-    opacity: 0;
+    transform: translateY(10px) scale(0.992);
+    filter: saturate(0.9);
   }
 
   to {
-    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: saturate(1);
   }
 }
 
@@ -797,7 +811,7 @@ input[type='radio']:focus-visible {
   .weather-skeleton-icon,
   .weather-skeleton-icon-sm {
     animation: none;
-    background: rgba(177, 224, 247, 0.26);
+    background: #5f86a8;
   }
 
   .weather-content-visible {
