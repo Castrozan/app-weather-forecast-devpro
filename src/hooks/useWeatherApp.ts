@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
 import { DEFAULT_CITY } from '@/lib/defaultCity';
+import { withMinimumDuration } from '@/lib/minimumDuration';
 import { requestUserCoordinates } from '@/services/client/location/requestUserCoordinates';
 import { weatherApiClient } from '@/services/client/weatherApiClient';
 import type { CityCandidate, TemperatureUnit, WeatherResponse } from '@/types/weather';
@@ -26,6 +27,7 @@ export type WeatherAppState = {
 const LOCAL_CITY_NAME = 'Near You';
 const LOCAL_COUNTRY_NAME = 'Local';
 const LAZY_GEOLOCATION_DELAY_MS = 1_600;
+const MIN_WEATHER_LOADING_DURATION_MS = 500;
 
 type LoadWeatherOptions = {
   loadingMessage?: string;
@@ -66,7 +68,7 @@ export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherA
   });
 
   const weatherMutation = useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       lat,
       lon,
       units: nextUnits,
@@ -78,7 +80,11 @@ export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherA
       units: TemperatureUnit;
       city: string;
       country: string;
-    }) => weatherApiClient.fetchWeather(lat, lon, nextUnits, { city, country }),
+    }) =>
+      withMinimumDuration(
+        () => weatherApiClient.fetchWeather(lat, lon, nextUnits, { city, country }),
+        MIN_WEATHER_LOADING_DURATION_MS,
+      ),
   });
 
   const loadWeatherForCity = useCallback(
@@ -136,8 +142,6 @@ export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherA
 
       if (cities.length === 0) {
         setCandidateCities([]);
-        setWeather(null);
-        setSelectedCity(null);
         setStatusMessage('No city found for this query.');
         return;
       }
@@ -148,13 +152,9 @@ export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherA
       }
 
       setCandidateCities(cities);
-      setSelectedCity(null);
-      setWeather(null);
       setStatusMessage('Multiple matches found. Select the correct city.');
     } catch (error) {
       setCandidateCities([]);
-      setWeather(null);
-      setSelectedCity(null);
       setStatusMessage(error instanceof Error ? error.message : 'Failed to search cities.');
     }
   };

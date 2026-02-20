@@ -1,17 +1,28 @@
 'use client';
 
 import { useWeatherApp } from '@/hooks/useWeatherApp';
+import { isTransientStatusMessage } from '@/lib/statusMessage';
 
 import { CityCandidatesList } from '../search/CityCandidatesList';
 import { SearchForm } from '../search/SearchForm';
 import { UnitToggle } from '../search/UnitToggle';
 import { ForecastGrid } from '../weather/ForecastGrid';
 import { CurrentWeatherPanel } from '../weather/CurrentWeatherPanel';
+import { WeatherPanelSkeleton } from '../weather/WeatherPanelSkeleton';
 import { Disclaimer } from './Disclaimer';
 import { StatusState } from './StatusState';
 
 export const WeatherDashboard = () => {
   const app = useWeatherApp();
+  const hasTransientStatus =
+    app.statusMessage !== null && isTransientStatusMessage(app.statusMessage);
+  const shouldShowSkeleton =
+    app.isLoadingWeather ||
+    (!app.weather && (app.isSearching || hasTransientStatus || !app.statusMessage));
+  const weatherContentKey = app.weather
+    ? `${app.weather.location.lat},${app.weather.location.lon},${app.weather.current.temperature},${app.weather.units}`
+    : 'empty-weather-content';
+  const hasWeather = app.weather !== null;
 
   return (
     <main className="app-shell">
@@ -49,12 +60,22 @@ export const WeatherDashboard = () => {
           <p className="panel-subtitle">Current conditions and daily outlook</p>
         </header>
         <StatusState message={app.statusMessage} />
-        {app.weather ? (
-          <>
-            <CurrentWeatherPanel weather={app.weather} />
-            <ForecastGrid weather={app.weather} />
-          </>
-        ) : null}
+        <div className="weather-stage">
+          {hasWeather ? (
+            <div
+              className={`weather-content weather-content-visible ${app.isLoadingWeather ? 'weather-content-loading' : ''}`}
+              key={weatherContentKey}
+            >
+              <CurrentWeatherPanel weather={app.weather} />
+              <ForecastGrid weather={app.weather} />
+            </div>
+          ) : null}
+          {shouldShowSkeleton ? (
+            <div className={`weather-skeleton-layer ${hasWeather ? 'weather-skeleton-overlay' : ''}`}>
+              <WeatherPanelSkeleton />
+            </div>
+          ) : null}
+        </div>
         <Disclaimer />
       </section>
     </main>

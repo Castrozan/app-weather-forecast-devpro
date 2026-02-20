@@ -23,6 +23,12 @@ const cityCandidates: CityCandidate[] = [
   },
 ];
 
+const wait = async (durationMs: number): Promise<void> => {
+  await new Promise((resolve) => {
+    setTimeout(resolve, durationMs);
+  });
+};
+
 const denyGeolocationPermission = async (page: Page) => {
   await page.addInitScript(() => {
     if (!navigator.permissions) {
@@ -185,6 +191,37 @@ const buildWeatherPayload = (
 };
 
 test.describe('Weather dashboard', () => {
+  test('renders skeleton while weather data is loading and fades into content', async ({
+    page,
+  }) => {
+    await denyGeolocationPermission(page);
+
+    await page.route('**/api/v1/weather?**', async (route) => {
+      const url = new URL(route.request().url());
+      const units = (url.searchParams.get('units') ?? 'metric') as TemperatureUnit;
+      const city = url.searchParams.get('city') ?? 'Las Vegas';
+      const country = url.searchParams.get('country') ?? 'United States';
+      const lat = Number(url.searchParams.get('lat') ?? '36.1699');
+      const lon = Number(url.searchParams.get('lon') ?? '-115.1398');
+
+      await wait(500);
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(buildWeatherPayload(city, country, lat, lon, units)),
+      });
+    });
+
+    await page.goto('/');
+
+    await expect(page.locator('.weather-skeleton')).toBeVisible();
+    await expect(page.locator('.status-message')).toHaveCount(0);
+    await expect(page.locator('.current-city')).toHaveText('Las Vegas');
+    await expect(page.locator('.weather-content-visible')).toBeVisible();
+    await expect(page.locator('.weather-skeleton')).toHaveCount(0);
+  });
+
   test('searches, selects a city, and toggles units', async ({ page }) => {
     let weatherRequests = 0;
     await denyGeolocationPermission(page);
@@ -255,7 +292,7 @@ test.describe('Weather dashboard', () => {
     await expect.poll(() => weatherRequests).toBe(3);
   });
 
-  test('shows empty state when no city matches query', async ({ page }) => {
+  test('keeps current weather visible when no city matches query', async ({ page }) => {
     await denyGeolocationPermission(page);
 
     await page.route('**/api/v1/cities?**', async (route) => {
@@ -286,11 +323,14 @@ test.describe('Weather dashboard', () => {
 
     await page.goto('/');
 
+    await expect(page.locator('.current-city')).toHaveText('Las Vegas');
+
     await page.getByLabel('Search').fill('Atlantis');
     await page.getByRole('button', { name: 'Find' }).click();
 
     await expect(page.locator('.status-message')).toContainText('No city found for this query.');
-    await expect(page.locator('.forecast-card')).toHaveCount(0);
+    await expect(page.locator('.current-city')).toHaveText('Las Vegas');
+    await expect(page.locator('.forecast-card')).toHaveCount(5);
   });
 
   test('lazily loads user location when geolocation is granted', async ({ page }) => {
