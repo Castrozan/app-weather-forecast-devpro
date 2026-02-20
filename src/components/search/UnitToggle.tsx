@@ -12,7 +12,7 @@ export const UnitToggle = ({ value, onChange, disabled }: UnitToggleProps) => {
   return (
     <fieldset className="unit-toggle" aria-label="Temperature unit">
       <legend className="unit-legend">Units</legend>
-      <label>
+      <label className={`unit-option ${value === 'metric' ? 'unit-option-active' : ''}`}>
         <input
           type="radio"
           name="units"
@@ -21,9 +21,9 @@ export const UnitToggle = ({ value, onChange, disabled }: UnitToggleProps) => {
           onChange={() => onChange('metric')}
           disabled={disabled}
         />
-        C
+        <span>°C</span>
       </label>
-      <label>
+      <label className={`unit-option ${value === 'imperial' ? 'unit-option-active' : ''}`}>
         <input
           type="radio"
           name="units"
@@ -32,7 +32,7 @@ export const UnitToggle = ({ value, onChange, disabled }: UnitToggleProps) => {
           onChange={() => onChange('imperial')}
           disabled={disabled}
         />
-        F
+        <span>°F</span>
       </label>
     </fieldset>
   );

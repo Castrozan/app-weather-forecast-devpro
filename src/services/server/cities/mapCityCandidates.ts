@@ -1,18 +1,11 @@
 import type { CityCandidate } from '@/types/weather';
+import type { WeatherProviderCity } from '@/services/server/weather/ports/weatherProvider';
 
-export type OpenWeatherGeocodeEntry = {
-  name: string;
-  country: string;
-  state?: string;
-  lat: number;
-  lon: number;
-};
-
-const buildDisplayName = ({ name, state, country }: OpenWeatherGeocodeEntry): string => {
+const buildDisplayName = ({ name, state, country }: WeatherProviderCity): string => {
   return [name, state, country].filter(Boolean).join(', ');
 };
 
-export const mapCityCandidates = (entries: OpenWeatherGeocodeEntry[]): CityCandidate[] => {
+export const mapCityCandidates = (entries: WeatherProviderCity[]): CityCandidate[] => {
   const deduplicated = new Map<string, CityCandidate>();
 
   for (const entry of entries) {

@@ -1,14 +1,4 @@
-export type OpenWeatherForecastEntry = {
-  dt: number;
-  main: {
-    temp_min: number;
-    temp_max: number;
-  };
-  weather: Array<{
-    icon: string;
-    description: string;
-  }>;
-};
+import type { WeatherProviderForecastEntry } from '@/services/server/weather/ports/weatherProvider';
 
 export type AggregatedForecastDay = {
   date: string;
@@ -22,7 +12,7 @@ type GroupedDay = {
   date: string;
   min: number;
   max: number;
-  entries: OpenWeatherForecastEntry[];
+  entries: WeatherProviderForecastEntry[];
 };
 
 const toLocalDateKey = (timestampSeconds: number, timezoneOffsetSeconds: number): string => {
@@ -36,11 +26,11 @@ const toLocalHour = (timestampSeconds: number, timezoneOffsetSeconds: number): n
 };
 
 const pickRepresentativeEntry = (
-  entries: OpenWeatherForecastEntry[],
+  entries: WeatherProviderForecastEntry[],
   timezoneOffsetSeconds: number,
-): OpenWeatherForecastEntry => {
+): WeatherProviderForecastEntry => {
   const midday = entries.find((entry) => {
-    const hour = toLocalHour(entry.dt, timezoneOffsetSeconds);
+    const hour = toLocalHour(entry.timestampSeconds, timezoneOffsetSeconds);
     return hour >= 11 && hour <= 14;
   });
 
@@ -48,7 +38,7 @@ const pickRepresentativeEntry = (
     return midday;
   }
 
-  const daytime = entries.find((entry) => entry.weather[0]?.icon.endsWith('d'));
+  const daytime = entries.find((entry) => entry.isDaylight);
 
   if (daytime) {
     return daytime;
@@ -58,28 +48,28 @@ const pickRepresentativeEntry = (
 };
 
 export const aggregateForecastByDay = (
-  entries: OpenWeatherForecastEntry[],
+  entries: WeatherProviderForecastEntry[],
   timezoneOffsetSeconds: number,
   days = 5,
 ): AggregatedForecastDay[] => {
   const grouped = new Map<string, GroupedDay>();
 
   for (const entry of entries) {
-    const dateKey = toLocalDateKey(entry.dt, timezoneOffsetSeconds);
+    const dateKey = toLocalDateKey(entry.timestampSeconds, timezoneOffsetSeconds);
     const existing = grouped.get(dateKey);
 
     if (!existing) {
       grouped.set(dateKey, {
         date: dateKey,
-        min: entry.main.temp_min,
-        max: entry.main.temp_max,
+        min: entry.minTemperature,
+        max: entry.maxTemperature,
         entries: [entry],
       });
       continue;
     }
 
-    existing.min = Math.min(existing.min, entry.main.temp_min);
-    existing.max = Math.max(existing.max, entry.main.temp_max);
+    existing.min = Math.min(existing.min, entry.minTemperature);
+    existing.max = Math.max(existing.max, entry.maxTemperature);
     existing.entries.push(entry);
   }
 
@@ -88,17 +78,13 @@ export const aggregateForecastByDay = (
     .slice(0, days)
     .map((day) => {
       const representative = pickRepresentativeEntry(day.entries, timezoneOffsetSeconds);
-      const firstWeather = representative.weather[0] ?? {
-        icon: '01d',
-        description: 'clear sky',
-      };
 
       return {
         date: day.date,
         min: day.min,
         max: day.max,
-        icon: firstWeather.icon,
-        description: firstWeather.description,
+        icon: representative.icon,
+        description: representative.description,
       };
     });
 };

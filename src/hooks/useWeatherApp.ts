@@ -40,11 +40,15 @@ export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherA
       lat,
       lon,
       units: nextUnits,
+      city,
+      country,
     }: {
       lat: number;
       lon: number;
       units: TemperatureUnit;
-    }) => weatherApiClient.fetchWeather(lat, lon, nextUnits),
+      city: string;
+      country: string;
+    }) => weatherApiClient.fetchWeather(lat, lon, nextUnits, { city, country }),
   });
 
   const loadWeatherForCity = async (
@@ -58,6 +62,8 @@ export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherA
         lat: city.lat,
         lon: city.lon,
         units: nextUnits,
+        city: city.name,
+        country: city.country,
       });
       setWeather(weatherData);
       setStatusMessage(null);

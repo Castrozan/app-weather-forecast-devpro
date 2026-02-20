@@ -1,34 +1,44 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  aggregateForecastByDay,
-  type OpenWeatherForecastEntry,
-} from '@/services/server/forecast/aggregateForecastByDay';
+import { aggregateForecastByDay } from '@/services/server/forecast/aggregateForecastByDay';
+import type { WeatherProviderForecastEntry } from '@/services/server/weather/ports/weatherProvider';
 
 const toUnix = (iso: string): number => Math.floor(new Date(iso).getTime() / 1000);
 
 describe('aggregateForecastByDay', () => {
   it('groups 3-hour entries by day and returns min/max values', () => {
-    const entries: OpenWeatherForecastEntry[] = [
+    const entries: WeatherProviderForecastEntry[] = [
       {
-        dt: toUnix('2026-02-20T00:00:00Z'),
-        main: { temp_min: 7, temp_max: 11 },
-        weather: [{ icon: '10d', description: 'light rain' }],
+        timestampSeconds: toUnix('2026-02-20T00:00:00Z'),
+        minTemperature: 7,
+        maxTemperature: 11,
+        icon: '10d',
+        description: 'light rain',
+        isDaylight: false,
       },
       {
-        dt: toUnix('2026-02-20T12:00:00Z'),
-        main: { temp_min: 9, temp_max: 18 },
-        weather: [{ icon: '01d', description: 'clear sky' }],
+        timestampSeconds: toUnix('2026-02-20T12:00:00Z'),
+        minTemperature: 9,
+        maxTemperature: 18,
+        icon: '01d',
+        description: 'clear sky',
+        isDaylight: true,
       },
       {
-        dt: toUnix('2026-02-21T03:00:00Z'),
-        main: { temp_min: 6, temp_max: 10 },
-        weather: [{ icon: '04n', description: 'broken clouds' }],
+        timestampSeconds: toUnix('2026-02-21T03:00:00Z'),
+        minTemperature: 6,
+        maxTemperature: 10,
+        icon: '04n',
+        description: 'broken clouds',
+        isDaylight: false,
       },
       {
-        dt: toUnix('2026-02-21T15:00:00Z'),
-        main: { temp_min: 11, temp_max: 19 },
-        weather: [{ icon: '03d', description: 'scattered clouds' }],
+        timestampSeconds: toUnix('2026-02-21T15:00:00Z'),
+        minTemperature: 11,
+        maxTemperature: 19,
+        icon: '03d',
+        description: 'scattered clouds',
+        isDaylight: true,
       },
     ];
 
@@ -52,21 +62,30 @@ describe('aggregateForecastByDay', () => {
   });
 
   it('respects the days limit and sorts ascending by date', () => {
-    const entries: OpenWeatherForecastEntry[] = [
+    const entries: WeatherProviderForecastEntry[] = [
       {
-        dt: toUnix('2026-02-25T12:00:00Z'),
-        main: { temp_min: 10, temp_max: 15 },
-        weather: [{ icon: '01d', description: 'clear sky' }],
+        timestampSeconds: toUnix('2026-02-25T12:00:00Z'),
+        minTemperature: 10,
+        maxTemperature: 15,
+        icon: '01d',
+        description: 'clear sky',
+        isDaylight: true,
       },
       {
-        dt: toUnix('2026-02-23T12:00:00Z'),
-        main: { temp_min: 8, temp_max: 14 },
-        weather: [{ icon: '01d', description: 'clear sky' }],
+        timestampSeconds: toUnix('2026-02-23T12:00:00Z'),
+        minTemperature: 8,
+        maxTemperature: 14,
+        icon: '01d',
+        description: 'clear sky',
+        isDaylight: true,
       },
       {
-        dt: toUnix('2026-02-24T12:00:00Z'),
-        main: { temp_min: 9, temp_max: 13 },
-        weather: [{ icon: '01d', description: 'clear sky' }],
+        timestampSeconds: toUnix('2026-02-24T12:00:00Z'),
+        minTemperature: 9,
+        maxTemperature: 13,
+        icon: '01d',
+        description: 'clear sky',
+        isDaylight: true,
       },
     ];
 
@@ -78,11 +97,14 @@ describe('aggregateForecastByDay', () => {
   });
 
   it('applies timezone offset when grouping by date', () => {
-    const entries: OpenWeatherForecastEntry[] = [
+    const entries: WeatherProviderForecastEntry[] = [
       {
-        dt: toUnix('2026-02-20T23:00:00Z'),
-        main: { temp_min: 5, temp_max: 9 },
-        weather: [{ icon: '10n', description: 'rain' }],
+        timestampSeconds: toUnix('2026-02-20T23:00:00Z'),
+        minTemperature: 5,
+        maxTemperature: 9,
+        icon: '10n',
+        description: 'rain',
+        isDaylight: false,
       },
     ];
 

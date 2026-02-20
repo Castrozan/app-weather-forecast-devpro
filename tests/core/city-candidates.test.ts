@@ -3,12 +3,12 @@ import { describe, expect, it } from 'vitest';
 import {
   mapCityCandidates,
   shouldAutoSelectCity,
-  type OpenWeatherGeocodeEntry,
 } from '@/services/server/cities/mapCityCandidates';
+import type { WeatherProviderCity } from '@/services/server/weather/ports/weatherProvider';
 
 describe('mapCityCandidates', () => {
   it('normalizes geocode candidates into deterministic city options', () => {
-    const input: OpenWeatherGeocodeEntry[] = [
+    const input: WeatherProviderCity[] = [
       {
         name: 'Springfield',
         state: 'Illinois',

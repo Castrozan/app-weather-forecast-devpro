@@ -1,11 +1,17 @@
 import type { Metadata } from 'next';
-import { Space_Grotesk } from 'next/font/google';
+import { DM_Sans, Fraunces } from 'next/font/google';
 
 import { AppProviders } from '@/components/shared/AppProviders';
 import '@/styles/globals.css';
 
-const spaceGrotesk = Space_Grotesk({
+const dmSans = DM_Sans({
   subsets: ['latin'],
+  variable: '--font-body',
+});
+
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  variable: '--font-display',
 });
 
 export const metadata: Metadata = {
@@ -20,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={spaceGrotesk.className}>
+      <body className={`${dmSans.variable} ${fraunces.variable}`}>
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getWeatherByCoordinates } from '@/services/server/weatherFacade';
+import {
+  isWeatherProviderConfigurationError,
+  isWeatherProviderUpstreamError,
+} from '@/services/server/weather/errors';
 import { verifyRateLimit, verifySession } from '@/services/server/security/requestSecurity';
 
 import { parseWeatherQuery } from './parseWeatherQuery';
@@ -29,7 +33,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   try {
     const query = parseWeatherQuery(request.nextUrl.searchParams);
-    const weather = await getWeatherByCoordinates(query.lat, query.lon, query.units);
+    const locationHint = query.city ? { name: query.city, country: query.country } : undefined;
+    const weather = await getWeatherByCoordinates(query.lat, query.lon, query.units, locationHint);
 
     return NextResponse.json(weather, {
       headers: {
@@ -40,6 +45,20 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   } catch (error) {
     if (error instanceof Error && error.message === 'Invalid weather query parameters') {
       return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    if (isWeatherProviderConfigurationError(error)) {
+      return NextResponse.json(
+        { error: 'Weather provider is not configured on this server.' },
+        { status: 503 },
+      );
+    }
+
+    if (isWeatherProviderUpstreamError(error)) {
+      return NextResponse.json(
+        { error: 'Weather provider is temporarily unavailable.' },
+        { status: 502 },
+      );
     }
 
     return NextResponse.json(

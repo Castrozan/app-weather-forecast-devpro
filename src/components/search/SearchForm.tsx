@@ -23,7 +23,7 @@ export const SearchForm = ({ value, onChange, onSubmit, disabled }: SearchFormPr
         id="city-search"
         name="city"
         type="text"
-        placeholder="Search city"
+        placeholder="Try New York"
         autoComplete="off"
         value={value}
         onChange={(event) => onChange(event.target.value)}

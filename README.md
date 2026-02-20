@@ -1,6 +1,7 @@
 # App Weather Forecast
 
 Frontend-first weather app built with Next.js, with minimal API routes and clear service boundaries so the backend layer can be extracted later.
+The upstream provider is Open-Meteo (no API key required for this challenge).
 
 ## Prerequisites
 
@@ -29,6 +30,7 @@ npm run dev
 
 ```bash
 npm run verify
+npm run test:e2e
 ```
 
 ## TDD-first core coverage
@@ -39,6 +41,7 @@ npm run verify
 - in-memory rate limiting
 - weather response caching
 - API weather query validation
+- Playwright integration/e2e coverage for search flow and unit toggle
 
 ## Deployment
 

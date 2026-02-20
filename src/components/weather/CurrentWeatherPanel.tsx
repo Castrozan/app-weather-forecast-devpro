@@ -1,12 +1,10 @@
-import Image from 'next/image';
-
 import type { WeatherResponse } from '@/types/weather';
+
+import { resolveWeatherIconGlyph } from './weatherIconGlyph';
 
 type CurrentWeatherPanelProps = {
   weather: WeatherResponse;
 };
-
-const iconUrl = (icon: string): string => `https://openweathermap.org/img/wn/${icon}@2x.png`;
 
 const unitSymbol = (units: WeatherResponse['units']): string => {
   return units === 'metric' ? 'C' : 'F';
@@ -15,18 +13,46 @@ const unitSymbol = (units: WeatherResponse['units']): string => {
 export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
   return (
     <section className="current-weather" aria-label="Current weather">
-      <Image
-        src={iconUrl(weather.current.icon)}
-        alt={weather.current.description}
-        width={120}
-        height={120}
-        className="current-icon"
-      />
-      <h2 className="current-city">{weather.location.name}</h2>
-      <p className="current-temp">
-        {weather.current.temperature}°{unitSymbol(weather.units)}
-      </p>
-      <p className="current-description">{weather.current.description}</p>
+      <div className="current-main">
+        <div>
+          <p className="current-kicker">
+            {weather.location.country} · {weather.location.lat.toFixed(2)} /{' '}
+            {weather.location.lon.toFixed(2)}
+          </p>
+          <h2 className="current-city">{weather.location.name}</h2>
+          <p className="current-description">{weather.current.description}</p>
+        </div>
+        <div className="current-temperature">
+          <span className="current-icon" aria-hidden="true">
+            {resolveWeatherIconGlyph(weather.current.icon)}
+          </span>
+          <p className="current-temp">
+            {weather.current.temperature}°{unitSymbol(weather.units)}
+          </p>
+        </div>
+      </div>
+      <dl className="current-stats">
+        <div className="current-stat">
+          <dt>Min</dt>
+          <dd>
+            {weather.current.min}°{unitSymbol(weather.units)}
+          </dd>
+        </div>
+        <div className="current-stat">
+          <dt>Max</dt>
+          <dd>
+            {weather.current.max}°{unitSymbol(weather.units)}
+          </dd>
+        </div>
+        <div className="current-stat">
+          <dt>Humidity</dt>
+          <dd>{weather.current.humidity}%</dd>
+        </div>
+        <div className="current-stat">
+          <dt>Wind</dt>
+          <dd>{weather.current.windSpeed}</dd>
+        </div>
+      </dl>
     </section>
   );
 };

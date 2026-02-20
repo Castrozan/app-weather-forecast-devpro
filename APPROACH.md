@@ -2,182 +2,152 @@
 
 ## 1. Goal
 
-Build a frontend-first weather app with a minimal Next.js API surface, but with strict boundaries so server logic can be moved to a standalone API later.
+Build a frontend-first weather app with a minimal Next.js API layer, but with strict boundaries so API logic can be extracted to a standalone service later.
 
 ## 2. Confirmed Decisions
 
-1. Keep Next API routes for now, with clean separation to extract later.
-2. Support both units (`metric` and `imperial`) with a user toggle.
-3. Handle city ambiguity with geocoding + user selection.
-4. Forecast cards use daily `min`/`max` aggregation.
-5. Fully responsive across desktop/tablet/mobile.
-6. Use OpenWeather as upstream provider.
-7. Use in-memory cache.
-8. Add token gate and API rate limit.
-9. Target deployment on Render with CI pipeline.
-10. Prioritize clean code and strict single responsibility per file/component.
+1. Keep Next API routes now, with clean separations for extraction.
+2. Use Open-Meteo as the weather/geocoding upstream.
+3. Keep units toggle (`metric` and `imperial`) configurable by user.
+4. Handle city duplication by returning candidates and forcing explicit selection when needed.
+5. Forecast cards must show daily `min`/`max`.
+6. UI must be responsive across desktop/tablet/mobile.
+7. Keep cache and rate limit in-memory for now.
+8. Enforce token-gated app access + per-IP rate limit.
+9. Deploy target is Render with CI pipeline.
+10. Prioritize strict single responsibility per file/component.
 
-## 3. Technical Baseline
+## 3. Architecture (Hexagonal)
 
-- Framework: Next.js App Router + TypeScript
-- Runtime: Node 24
-- Validation: Zod
-- Client async state: TanStack Query
-- Testing: Vitest + Testing Library
-- Quality gates: ESLint + Prettier + TypeScript strict mode
+### 3.1 API boundary
 
-## 4. Current Project Structure
+- `src/app/api/v1/*` is the transport layer only.
+- Routes validate inputs, enforce security/rate limits, and delegate to server services.
+- Domain and provider logic stays outside route handlers.
+
+### 3.2 Weather provider ports and adapters
 
 ```txt
-src/
-  app/
-    api/v1/
-      auth/route.ts
-      cities/route.ts
-      weather/route.ts
-      weather/parseWeatherQuery.ts
-    auth/page.tsx
-    layout.tsx
-    page.tsx
-  components/
-    search/
-    shared/
-    weather/
-  hooks/
-    useWeatherApp.ts
-  lib/
-    config.ts
-  services/
-    client/
-      weatherApiClient.ts
-    server/
-      cache/
-      cities/
-      forecast/
-      openweather/
-      security/
-      weatherFacade.ts
-  styles/
-  types/
-tests/
-  api/
-  core/
+src/services/server/weather/
+  ports/
+    weatherProvider.ts
+  adapters/
+    openMeteo/
+      openMeteoWeatherProvider.ts
+      weatherCodeMapper.ts
+  errors.ts
+  resolveWeatherProvider.ts
 ```
 
-## 5. API Contract (Minimal)
+- `WeatherProviderPort` is the stable contract (`searchCities`, `fetchWeatherByCoordinates`).
+- `openMeteoWeatherProvider` is an adapter implementation.
+- `resolveWeatherProvider` is the composition point so we can swap adapters without touching routes/facade.
+
+### 3.3 Domain services
+
+- `src/services/server/weatherFacade.ts`
+  - orchestrates provider calls
+  - aggregates hourly forecast into daily cards
+  - applies cache with TTL
+- `src/services/server/cities/*`
+  - normalizes/deduplicates geocoding candidates
+- `src/services/server/security/*`
+  - access token validation
+  - per-IP in-memory rate limiting
+
+## 4. Minimal API Contract
 
 ### `POST /api/v1/auth`
 
-- Validates app token and sets an HTTP-only session cookie.
+- Validates app token and sets HTTP-only session cookie.
 - Returns `401` for invalid token.
-- If token mode is disabled (`APP_ACCESS_TOKEN` empty), returns success.
+- If token mode disabled (`APP_ACCESS_TOKEN` empty), returns success.
 
 ### `GET /api/v1/cities?query=...`
 
-- Requires valid session when token mode is enabled.
-- Applies rate limit.
+- Auth-gated when token mode is on.
+- Per-IP rate-limited.
 - Returns normalized city candidates with `lat/lon`.
 
 ### `GET /api/v1/weather?lat=...&lon=...&units=...`
 
-- Requires valid session when token mode is enabled.
-- Applies rate limit.
-- Validates query with Zod.
+- Auth-gated when token mode is on.
+- Per-IP rate-limited.
+- Query validated with Zod.
 - Returns normalized current weather + aggregated 5-day forecast.
 
-## 6. Frontend Flow
+## 5. Frontend Flow
 
-1. User searches city name.
-2. App calls `GET /api/v1/cities`.
-3. If one match: fetch weather directly.
-4. If many matches: show selection list.
-5. App calls `GET /api/v1/weather` with `lat/lon` + selected units.
+1. User types city and submits search.
+2. UI calls `GET /api/v1/cities`.
+3. If one result, weather loads directly.
+4. If multiple, user picks exact city.
+5. UI calls `GET /api/v1/weather` using selected `lat/lon` + units.
 6. Unit toggle re-fetches weather for selected city.
 
-## 7. TDD Plan and Coverage
+## 6. Testing Strategy (TDD + Integration + E2E)
 
-We keep a red -> green -> refactor cycle for core domain logic.
+### 6.1 Unit/core tests (Vitest)
 
-Covered tests in `tests/`:
+- Forecast aggregation by timezone + min/max.
+- City candidate normalization and deduplication.
+- Rate limit/auth behavior.
+- Weather facade caching behavior.
+- API weather query parsing/validation.
 
-- `tests/core/forecast-aggregation.test.ts`
-  - timezone grouping
-  - min/max aggregation
-  - day limit behavior
-- `tests/core/city-candidates.test.ts`
-  - candidate normalization
-  - duplicate handling
-  - auto-select rule
-- `tests/core/rate-limit-and-auth.test.ts`
-  - rate limiter window semantics
-  - token validation behavior
-- `tests/core/weather-facade-cache.test.ts`
-  - weather cache key behavior by `lat/lon/units`
-- `tests/api/weather-query.test.ts`
-  - weather query validation and default unit
+### 6.2 Browser integration/e2e tests (Playwright)
 
-## 8. Dev Environment (devenv + Node 24)
+- Search flow with multiple city matches.
+- City selection and weather rendering.
+- Unit toggle causing weather re-fetch and updated values.
+- Empty search result state.
 
-Files:
+## 7. Dev Environment
 
-- `devenv.nix`
-- `.envrc`
+- `devenv` + `direnv` for reproducible local setup.
+- Node 24 enforced by:
+  - `package.json` engines
+  - `devenv.nix`
+  - `NPM_CONFIG_ENGINE_STRICT=true` in shell.
 
-Steps:
+Run:
 
-1. Install `devenv` and `direnv`.
-2. Run `direnv allow` in repo root.
-3. Enter shell (automatic with direnv) and run:
-   - `npm ci`
-   - `npm run dev`
+1. `direnv allow`
+2. `npm ci`
+3. `npm run dev`
 
-Environment contract:
+## 8. Quality Gates and CI
 
-- Node 24 is enforced via `package.json` engines and `devenv.nix`.
-- `NPM_CONFIG_ENGINE_STRICT=true` is set in dev shell.
-
-## 9. Quality Gates
-
-Commands:
+Local quality gates:
 
 - `npm run format:check`
 - `npm run lint`
 - `npm run typecheck`
 - `npm run test`
-- `npm run verify` (runs all checks)
+- `npm run test:e2e`
 
-## 10. CI Pipeline
+CI workflow (`.github/workflows/ci.yml`):
 
-File:
+1. Setup Node 24
+2. Install dependencies
+3. Run `npm run verify`
+4. Install Playwright Chromium
+5. Run `npm run test:e2e`
+6. Run `npm run build`
 
-- `.github/workflows/ci.yml`
-
-Pipeline stages:
-
-1. Checkout
-2. Setup Node 24
-3. `npm ci`
-4. `npm run verify`
-5. `npm run build`
-
-## 11. Environment Variables
+## 9. Environment Variables
 
 Defined in `.env.example`:
 
-- `OPENWEATHER_API_KEY`
 - `APP_ACCESS_TOKEN`
 - `RATE_LIMIT_WINDOW_MS`
 - `RATE_LIMIT_MAX_REQUESTS`
 - `CACHE_TTL_SECONDS`
 - `NEXT_PUBLIC_DEFAULT_TEMPERATURE_UNIT`
 
-## 12. Architect Questions To Close
+Note: Open-Meteo upstream currently does not require an API key for this scope.
 
-1. Should token auth include an explicit logout endpoint and session revocation?
-2. Should rate limit be per-IP only, or per session token + IP?
-3. For Render multi-instance scale, do we accept per-instance in-memory limits/cache, or require Redis later?
-4. Should we exclude the current day from 5-day cards if only partial data exists?
-5. Do weekday labels need localization or fixed English output?
-6. What is the expected behavior when geocoding returns >5 candidates: hard cap or paginated search?
-7. Should we add visual regression tests (Playwright) for the frontend-focused requirement?
-8. Do we need structured logging/trace IDs on API responses for production debugging?
+## 10. Open Architecture Questions
+
+1. Should we add explicit logout/session revocation endpoints, or keep token sign-in only for this challenge scope?
+2. Should we add structured logging with request IDs now, or keep this deferred until post-MVP hardening?

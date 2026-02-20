@@ -14,6 +14,11 @@ const ensureOk = async (response: Response): Promise<Response> => {
   throw new Error(body?.error ?? `Request failed with status ${response.status}`);
 };
 
+type WeatherLocationContext = {
+  city: string;
+  country?: string;
+};
+
 export const weatherApiClient = {
   async signIn(token: string): Promise<void> {
     const response = await fetch('/api/v1/auth', {
@@ -35,8 +40,27 @@ export const weatherApiClient = {
     return payload.cities;
   },
 
-  async fetchWeather(lat: number, lon: number, units: TemperatureUnit): Promise<WeatherResponse> {
-    const response = await fetch(`/api/v1/weather?lat=${lat}&lon=${lon}&units=${units}`);
+  async fetchWeather(
+    lat: number,
+    lon: number,
+    units: TemperatureUnit,
+    location?: WeatherLocationContext,
+  ): Promise<WeatherResponse> {
+    const params = new URLSearchParams({
+      lat: String(lat),
+      lon: String(lon),
+      units,
+    });
+
+    if (location?.city) {
+      params.set('city', location.city);
+    }
+
+    if (location?.country) {
+      params.set('country', location.country);
+    }
+
+    const response = await fetch(`/api/v1/weather?${params.toString()}`);
     const ok = await ensureOk(response);
     return (await ok.json()) as WeatherResponse;
   },

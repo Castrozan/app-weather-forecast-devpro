@@ -27,5 +27,11 @@ jobs:
       - name: Verify quality gates
         run: npm run verify
 
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser integration/e2e tests
+        run: npm run test:e2e
+
       - name: Build
         run: npm run build

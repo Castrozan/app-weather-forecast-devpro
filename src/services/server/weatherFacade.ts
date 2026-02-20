@@ -2,12 +2,10 @@ import { appConfig } from '@/lib/config';
 import type { TemperatureUnit, WeatherResponse } from '@/types/weather';
 import { createInMemoryTtlCache } from '@/services/server/cache/inMemoryCache';
 import { aggregateForecastByDay } from '@/services/server/forecast/aggregateForecastByDay';
-import {
-  fetchCurrentWeather,
-  fetchForecast,
-} from '@/services/server/openweather/openWeatherClient';
+import type { WeatherLocationHint } from '@/services/server/weather/ports/weatherProvider';
+import { getWeatherProvider } from '@/services/server/weather/resolveWeatherProvider';
 
-const weekdayFormatter = new Intl.DateTimeFormat('en-US', {
+const weekdayFormatter = new Intl.DateTimeFormat(undefined, {
   weekday: 'long',
   timeZone: 'UTC',
 });
@@ -19,8 +17,16 @@ const mapDateToLabel = (date: string): string => {
 
 const weatherCache = createInMemoryTtlCache<WeatherResponse>();
 
-const weatherCacheKey = (lat: number, lon: number, units: TemperatureUnit): string => {
-  return `${lat}:${lon}:${units}`;
+const weatherCacheKey = (
+  lat: number,
+  lon: number,
+  units: TemperatureUnit,
+  locationHint?: WeatherLocationHint,
+): string => {
+  const normalizedName = locationHint?.name?.trim().toLowerCase() ?? '';
+  const normalizedCountry = locationHint?.country?.trim().toLowerCase() ?? '';
+
+  return `${lat}:${lon}:${units}:${normalizedName}:${normalizedCountry}`;
 };
 
 export const clearWeatherCache = (): void => {
@@ -31,9 +37,10 @@ export const getWeatherByCoordinates = async (
   lat: number,
   lon: number,
   units: TemperatureUnit,
+  locationHint?: WeatherLocationHint,
 ): Promise<WeatherResponse> => {
   const cacheTtlSeconds = appConfig.cacheTtlSeconds;
-  const key = weatherCacheKey(lat, lon, units);
+  const key = weatherCacheKey(lat, lon, units, locationHint);
 
   if (cacheTtlSeconds > 0) {
     const cached = weatherCache.get(key);
@@ -42,37 +49,34 @@ export const getWeatherByCoordinates = async (
     }
   }
 
-  const [current, forecast] = await Promise.all([
-    fetchCurrentWeather(lat, lon, units),
-    fetchForecast(lat, lon, units),
-  ]);
+  const provider = getWeatherProvider();
+  const weatherData = await provider.fetchWeatherByCoordinates({
+    lat,
+    lon,
+    units,
+    locationHint,
+  });
 
-  const daily = aggregateForecastByDay(forecast.list, current.timezone, 5).map((day) => ({
+  const daily = aggregateForecastByDay(
+    weatherData.forecastEntries,
+    weatherData.timezoneOffsetSeconds,
+    5,
+  ).map((day) => ({
     ...day,
     label: mapDateToLabel(day.date),
   }));
 
-  const currentWeather = current.weather[0] ?? {
-    description: 'clear sky',
-    icon: '01d',
-  };
-
   const response: WeatherResponse = {
-    location: {
-      name: current.name,
-      country: current.sys.country,
-      lat: current.coord.lat,
-      lon: current.coord.lon,
-    },
+    location: weatherData.location,
     units,
     current: {
-      temperature: Math.round(current.main.temp),
-      min: Math.round(current.main.temp_min),
-      max: Math.round(current.main.temp_max),
-      description: currentWeather.description,
-      icon: currentWeather.icon,
-      humidity: current.main.humidity,
-      windSpeed: current.wind.speed,
+      temperature: Math.round(weatherData.current.temperature),
+      min: Math.round(weatherData.current.min),
+      max: Math.round(weatherData.current.max),
+      description: weatherData.current.description,
+      icon: weatherData.current.icon,
+      humidity: weatherData.current.humidity,
+      windSpeed: weatherData.current.windSpeed,
     },
     forecastDaily: daily.map((day) => ({
       ...day,

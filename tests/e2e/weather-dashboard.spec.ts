@@ -1,0 +1,226 @@
+import { expect, test } from '@playwright/test';
+
+import type { CityCandidate, TemperatureUnit, WeatherResponse } from '../../src/types/weather';
+
+const cityCandidates: CityCandidate[] = [
+  {
+    id: '40.71427,-74.00597',
+    name: 'New York',
+    state: 'New York',
+    country: 'United States',
+    lat: 40.71427,
+    lon: -74.00597,
+    displayName: 'New York, New York, United States',
+  },
+  {
+    id: '53.07897,-0.14008',
+    name: 'New York',
+    state: 'England',
+    country: 'United Kingdom',
+    lat: 53.07897,
+    lon: -0.14008,
+    displayName: 'New York, England, United Kingdom',
+  },
+];
+
+const buildWeatherPayload = (units: TemperatureUnit): WeatherResponse => {
+  if (units === 'imperial') {
+    return {
+      location: {
+        name: 'New York',
+        country: 'United States',
+        lat: 40.71427,
+        lon: -74.00597,
+      },
+      units: 'imperial',
+      current: {
+        temperature: 72,
+        min: 67,
+        max: 75,
+        description: 'partly cloudy',
+        icon: '02d',
+        humidity: 55,
+        windSpeed: 8,
+      },
+      forecastDaily: [
+        {
+          date: '2026-02-20',
+          label: 'Friday',
+          min: 66,
+          max: 74,
+          icon: '02d',
+          description: 'mainly clear',
+        },
+        {
+          date: '2026-02-21',
+          label: 'Saturday',
+          min: 64,
+          max: 71,
+          icon: '03d',
+          description: 'overcast',
+        },
+        { date: '2026-02-22', label: 'Sunday', min: 60, max: 68, icon: '10d', description: 'rain' },
+        {
+          date: '2026-02-23',
+          label: 'Monday',
+          min: 58,
+          max: 67,
+          icon: '09d',
+          description: 'light rain showers',
+        },
+        {
+          date: '2026-02-24',
+          label: 'Tuesday',
+          min: 57,
+          max: 65,
+          icon: '04d',
+          description: 'overcast',
+        },
+      ],
+    };
+  }
+
+  return {
+    location: {
+      name: 'New York',
+      country: 'United States',
+      lat: 40.71427,
+      lon: -74.00597,
+    },
+    units: 'metric',
+    current: {
+      temperature: 22,
+      min: 19,
+      max: 24,
+      description: 'partly cloudy',
+      icon: '02d',
+      humidity: 55,
+      windSpeed: 13,
+    },
+    forecastDaily: [
+      {
+        date: '2026-02-20',
+        label: 'Friday',
+        min: 19,
+        max: 23,
+        icon: '02d',
+        description: 'mainly clear',
+      },
+      {
+        date: '2026-02-21',
+        label: 'Saturday',
+        min: 18,
+        max: 22,
+        icon: '03d',
+        description: 'overcast',
+      },
+      { date: '2026-02-22', label: 'Sunday', min: 16, max: 20, icon: '10d', description: 'rain' },
+      {
+        date: '2026-02-23',
+        label: 'Monday',
+        min: 14,
+        max: 19,
+        icon: '09d',
+        description: 'light rain showers',
+      },
+      {
+        date: '2026-02-24',
+        label: 'Tuesday',
+        min: 13,
+        max: 18,
+        icon: '04d',
+        description: 'overcast',
+      },
+    ],
+  };
+};
+
+test.describe('Weather dashboard', () => {
+  test('searches, selects a city, and toggles units', async ({ page }) => {
+    let weatherRequests = 0;
+
+    await page.route('**/api/v1/cities?**', async (route) => {
+      const url = new URL(route.request().url());
+      const query = (url.searchParams.get('query') ?? '').toLowerCase();
+
+      if (query.includes('new york')) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            query: 'New York',
+            cities: cityCandidates,
+          }),
+        });
+        return;
+      }
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          query: url.searchParams.get('query') ?? '',
+          cities: [],
+        }),
+      });
+    });
+
+    await page.route('**/api/v1/weather?**', async (route) => {
+      weatherRequests += 1;
+      const url = new URL(route.request().url());
+      const units = (url.searchParams.get('units') ?? 'metric') as TemperatureUnit;
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(buildWeatherPayload(units)),
+      });
+    });
+
+    await page.goto('/');
+
+    await expect(page.getByRole('heading', { name: 'Weather' })).toBeVisible();
+    await expect(page.locator('.status-message')).toContainText(
+      'Search for a city to see weather details.',
+    );
+
+    await page.getByLabel('Search').fill('New York');
+    await page.getByRole('button', { name: 'Find' }).click();
+
+    await expect(page.locator('.status-message')).toContainText(
+      'Multiple matches found. Select the correct city.',
+    );
+
+    await page.locator('.candidate-button').first().click();
+
+    await expect(page.locator('.current-city')).toHaveText('New York');
+    await expect(page.locator('.current-temp')).toContainText('22°C');
+    await expect(page.locator('.forecast-card')).toHaveCount(5);
+
+    await page.getByRole('radio', { name: '°F' }).check();
+
+    await expect(page.locator('.current-temp')).toContainText('72°F');
+    await expect.poll(() => weatherRequests).toBe(2);
+  });
+
+  test('shows empty state when no city matches query', async ({ page }) => {
+    await page.route('**/api/v1/cities?**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          query: 'Atlantis',
+          cities: [],
+        }),
+      });
+    });
+
+    await page.goto('/');
+
+    await page.getByLabel('Search').fill('Atlantis');
+    await page.getByRole('button', { name: 'Find' }).click();
+
+    await expect(page.locator('.status-message')).toContainText('No city found for this query.');
+    await expect(page.locator('.forecast-card')).toHaveCount(0);
+  });
+});

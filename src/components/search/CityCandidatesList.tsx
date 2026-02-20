@@ -15,11 +15,16 @@ export const CityCandidatesList = ({ cities, onSelect }: CityCandidatesListProps
   return (
     <div className="candidate-list-wrapper">
       <p className="candidate-list-title">Select city</p>
+      <p className="candidate-list-subtitle">Pick the exact location below.</p>
       <ul className="candidate-list">
         {cities.map((city) => (
           <li key={city.id}>
             <button type="button" className="candidate-button" onClick={() => onSelect(city)}>
-              {city.displayName}
+              <span className="candidate-name">{city.name}</span>
+              <span className="candidate-meta">
+                {city.state ? `${city.state}, ` : ''}
+                {city.country}
+              </span>
             </button>
           </li>
         ))}

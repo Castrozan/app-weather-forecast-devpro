@@ -1,4 +1,4 @@
-import { fetchGeocodedCities } from '@/services/server/openweather/openWeatherClient';
+import { getWeatherProvider } from '@/services/server/weather/resolveWeatherProvider';
 
 import { mapCityCandidates } from './mapCityCandidates';
 
@@ -9,6 +9,6 @@ export const searchCities = async (query: string) => {
     return [];
   }
 
-  const rawCities = await fetchGeocodedCities(trimmed, 5);
+  const rawCities = await getWeatherProvider().searchCities(trimmed, 5);
   return mapCityCandidates(rawCities);
 };

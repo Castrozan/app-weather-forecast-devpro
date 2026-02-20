@@ -16,6 +16,10 @@ export const WeatherDashboard = () => {
   return (
     <main className="app-shell">
       <aside className="sidebar">
+        <header className="sidebar-header">
+          <p className="sidebar-kicker">Live Forecast</p>
+          <h1 className="sidebar-title">City Search</h1>
+        </header>
         <SearchForm
           value={app.cityQuery}
           onChange={app.setCityQuery}
@@ -40,7 +44,10 @@ export const WeatherDashboard = () => {
       </aside>
 
       <section className="weather-panel">
-        <h1 className="panel-title">Weather</h1>
+        <header className="panel-header">
+          <h2 className="panel-title">Weather</h2>
+          <p className="panel-subtitle">Current conditions and daily outlook</p>
+        </header>
         <StatusState message={app.statusMessage} />
         {app.weather ? (
           <>
