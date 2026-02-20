@@ -1,0 +1,11 @@
+# Challenge/reference docs
+PLAN.md
+JOB-LISTING.md
+CITY-DUPLICATION-PROBLEMS.md
+CHALLENGE.pdf
+next-env.d.ts
+
+# Build artifacts
+.next
+coverage
+node_modules

@@ -1,0 +1,20 @@
+:root {
+  --page-bg: #e6e6e6;
+  --panel-start: #1d76bf;
+  --panel-end: #48c0f2;
+  --card-bg: rgba(255, 255, 255, 0.28);
+  --card-border: rgba(255, 255, 255, 0.16);
+  --text-main: #ffffff;
+  --text-dark: #121212;
+  --status-bg: rgba(0, 0, 0, 0.16);
+  --focus: #0c3f66;
+  --radius-md: 10px;
+  --radius-sm: 6px;
+  --shadow-sm: 0 8px 16px rgba(0, 0, 0, 0.12);
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+}
