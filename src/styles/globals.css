@@ -342,15 +342,45 @@ input[type='radio']:focus-visible {
   background: var(--status-error-bg);
 }
 
-.weather-content {
+.weather-stage {
   position: relative;
   z-index: 1;
+}
+
+.weather-content {
+  position: relative;
+  z-index: 2;
   display: grid;
   gap: 12px;
+  transition:
+    opacity 220ms ease,
+    filter 220ms ease,
+    transform 220ms ease;
 }
 
 .weather-content-visible {
   animation: weather-content-enter 320ms ease both;
+}
+
+.weather-content-loading {
+  opacity: 0.28;
+  filter: saturate(0.85) blur(1px);
+  transform: scale(0.995);
+}
+
+.weather-skeleton-layer {
+  position: relative;
+  z-index: 3;
+}
+
+.weather-skeleton-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.weather-skeleton-overlay .weather-skeleton {
+  animation: skeleton-overlay-enter 180ms ease both;
 }
 
 .weather-skeleton {
@@ -747,6 +777,16 @@ input[type='radio']:focus-visible {
   }
 }
 
+@keyframes skeleton-overlay-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .skeleton-line,
   .weather-skeleton-stat,
@@ -757,6 +797,10 @@ input[type='radio']:focus-visible {
   }
 
   .weather-content-visible {
+    animation: none;
+  }
+
+  .weather-skeleton-overlay .weather-skeleton {
     animation: none;
   }
 }

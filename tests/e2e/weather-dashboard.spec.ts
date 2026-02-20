@@ -357,6 +357,9 @@ test.describe('Weather dashboard', () => {
       const lon = Number(url.searchParams.get('lon') ?? '-115.1398');
 
       weatherRequestCities.push(city);
+      if (city === 'Near You') {
+        await wait(900);
+      }
 
       await route.fulfill({
         status: 200,
@@ -371,6 +374,9 @@ test.describe('Weather dashboard', () => {
     await expect(page.locator('.current-city')).toHaveText('Las Vegas');
     await expect(searchInput).toHaveValue('');
     await expect.poll(() => weatherRequestCities.includes('Near You')).toBe(true);
+    await expect(page.locator('.weather-skeleton')).toHaveCount(1);
+    await expect(page.locator('.weather-skeleton')).toBeVisible();
+    await expect(page.locator('.current-city')).toHaveText('Las Vegas');
     await expect(page.locator('.current-city')).toHaveText('Near You');
     await expect(searchInput).toHaveValue('');
   });
