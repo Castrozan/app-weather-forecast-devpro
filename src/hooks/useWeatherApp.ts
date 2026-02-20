@@ -179,7 +179,6 @@ export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherA
         hasInitializedRef.current = true;
         setSelectedCity(DEFAULT_CITY);
         setCandidateCities([]);
-        setCityQueryState(DEFAULT_CITY.name);
 
         try {
           await loadWeatherForCity(DEFAULT_CITY, units);
