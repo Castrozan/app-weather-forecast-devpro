@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 import type { CityCandidate, TemperatureUnit, WeatherResponse } from '../../src/types/weather';
 
@@ -23,14 +23,63 @@ const cityCandidates: CityCandidate[] = [
   },
 ];
 
-const buildWeatherPayload = (units: TemperatureUnit): WeatherResponse => {
+const denyGeolocationPermission = async (page: Page) => {
+  await page.addInitScript(() => {
+    if (!navigator.permissions) {
+      return;
+    }
+
+    Object.defineProperty(navigator.permissions, 'query', {
+      configurable: true,
+      value: async () => ({ state: 'denied' as const }),
+    });
+  });
+};
+
+const grantGeolocationPermission = async (page: Page, lat: number, lon: number) => {
+  await page.addInitScript(
+    (position: { lat: number; lon: number }) => {
+      if (navigator.permissions) {
+        Object.defineProperty(navigator.permissions, 'query', {
+          configurable: true,
+          value: async () => ({ state: 'granted' as const }),
+        });
+      }
+
+      if (!navigator.geolocation) {
+        return;
+      }
+
+      Object.defineProperty(navigator.geolocation, 'getCurrentPosition', {
+        configurable: true,
+        value: (onSuccess: (position: GeolocationPosition) => void) => {
+          onSuccess({
+            coords: {
+              latitude: position.lat,
+              longitude: position.lon,
+            } as GeolocationCoordinates,
+          } as GeolocationPosition);
+        },
+      });
+    },
+    { lat, lon },
+  );
+};
+
+const buildWeatherPayload = (
+  city: string,
+  country: string,
+  lat: number,
+  lon: number,
+  units: TemperatureUnit,
+): WeatherResponse => {
   if (units === 'imperial') {
     return {
       location: {
-        name: 'New York',
-        country: 'United States',
-        lat: 40.71427,
-        lon: -74.00597,
+        name: city,
+        country,
+        lat,
+        lon,
       },
       units: 'imperial',
       current: {
@@ -82,10 +131,10 @@ const buildWeatherPayload = (units: TemperatureUnit): WeatherResponse => {
 
   return {
     location: {
-      name: 'New York',
-      country: 'United States',
-      lat: 40.71427,
-      lon: -74.00597,
+      name: city,
+      country,
+      lat,
+      lon,
     },
     units: 'metric',
     current: {
@@ -138,6 +187,7 @@ const buildWeatherPayload = (units: TemperatureUnit): WeatherResponse => {
 test.describe('Weather dashboard', () => {
   test('searches, selects a city, and toggles units', async ({ page }) => {
     let weatherRequests = 0;
+    await denyGeolocationPermission(page);
 
     await page.route('**/api/v1/cities?**', async (route) => {
       const url = new URL(route.request().url());
@@ -169,20 +219,22 @@ test.describe('Weather dashboard', () => {
       weatherRequests += 1;
       const url = new URL(route.request().url());
       const units = (url.searchParams.get('units') ?? 'metric') as TemperatureUnit;
+      const city = url.searchParams.get('city') ?? 'Las Vegas';
+      const country = url.searchParams.get('country') ?? 'United States';
+      const lat = Number(url.searchParams.get('lat') ?? '36.1699');
+      const lon = Number(url.searchParams.get('lon') ?? '-115.1398');
 
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify(buildWeatherPayload(units)),
+        body: JSON.stringify(buildWeatherPayload(city, country, lat, lon, units)),
       });
     });
 
     await page.goto('/');
 
     await expect(page.getByRole('heading', { name: 'Weather' })).toBeVisible();
-    await expect(page.locator('.status-message')).toContainText(
-      'Search for a city to see weather details.',
-    );
+    await expect(page.locator('.current-city')).toHaveText('Las Vegas');
 
     await page.getByLabel('Search').fill('New York');
     await page.getByRole('button', { name: 'Find' }).click();
@@ -200,10 +252,12 @@ test.describe('Weather dashboard', () => {
     await page.getByRole('radio', { name: '°F' }).check();
 
     await expect(page.locator('.current-temp')).toContainText('72°F');
-    await expect.poll(() => weatherRequests).toBe(2);
+    await expect.poll(() => weatherRequests).toBe(3);
   });
 
   test('shows empty state when no city matches query', async ({ page }) => {
+    await denyGeolocationPermission(page);
+
     await page.route('**/api/v1/cities?**', async (route) => {
       await route.fulfill({
         status: 200,
@@ -215,6 +269,21 @@ test.describe('Weather dashboard', () => {
       });
     });
 
+    await page.route('**/api/v1/weather?**', async (route) => {
+      const url = new URL(route.request().url());
+      const units = (url.searchParams.get('units') ?? 'metric') as TemperatureUnit;
+      const city = url.searchParams.get('city') ?? 'Las Vegas';
+      const country = url.searchParams.get('country') ?? 'United States';
+      const lat = Number(url.searchParams.get('lat') ?? '36.1699');
+      const lon = Number(url.searchParams.get('lon') ?? '-115.1398');
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(buildWeatherPayload(city, country, lat, lon, units)),
+      });
+    });
+
     await page.goto('/');
 
     await page.getByLabel('Search').fill('Atlantis');
@@ -222,5 +291,44 @@ test.describe('Weather dashboard', () => {
 
     await expect(page.locator('.status-message')).toContainText('No city found for this query.');
     await expect(page.locator('.forecast-card')).toHaveCount(0);
+  });
+
+  test('lazily loads user location when geolocation is granted', async ({ page }) => {
+    const weatherRequestCities: string[] = [];
+    await grantGeolocationPermission(page, 34.0522, -118.2437);
+
+    await page.route('**/api/v1/cities?**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          query: '',
+          cities: [],
+        }),
+      });
+    });
+
+    await page.route('**/api/v1/weather?**', async (route) => {
+      const url = new URL(route.request().url());
+      const units = (url.searchParams.get('units') ?? 'metric') as TemperatureUnit;
+      const city = url.searchParams.get('city') ?? 'Las Vegas';
+      const country = url.searchParams.get('country') ?? 'United States';
+      const lat = Number(url.searchParams.get('lat') ?? '36.1699');
+      const lon = Number(url.searchParams.get('lon') ?? '-115.1398');
+
+      weatherRequestCities.push(city);
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(buildWeatherPayload(city, country, lat, lon, units)),
+      });
+    });
+
+    await page.goto('/');
+
+    await expect(page.locator('.current-city')).toHaveText('Las Vegas');
+    await expect.poll(() => weatherRequestCities.includes('Near You')).toBe(true);
+    await expect(page.locator('.current-city')).toHaveText('Near You');
   });
 });
