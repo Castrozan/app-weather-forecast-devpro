@@ -1,7 +1,7 @@
 'use client';
 
 import { useWeatherApp } from '@/hooks/useWeatherApp';
-import { isTransientStatusMessage } from '@/lib/statusMessage';
+import { isSearchStatusMessage, isTransientStatusMessage } from '@/lib/statusMessage';
 
 import { CityCandidatesList } from '../search/CityCandidatesList';
 import { SearchForm } from '../search/SearchForm';
@@ -14,15 +14,20 @@ import { StatusState } from './StatusState';
 
 export const WeatherDashboard = () => {
   const app = useWeatherApp();
+  const searchStatusMessage =
+    app.statusMessage !== null && isSearchStatusMessage(app.statusMessage) ? app.statusMessage : null;
+  const weatherStatusMessage =
+    app.statusMessage !== null && !isSearchStatusMessage(app.statusMessage) ? app.statusMessage : null;
   const hasTransientStatus =
-    app.statusMessage !== null && isTransientStatusMessage(app.statusMessage);
+    weatherStatusMessage !== null && isTransientStatusMessage(weatherStatusMessage);
   const shouldShowSkeleton =
     app.isLoadingWeather ||
-    (!app.weather && (app.isSearching || hasTransientStatus || !app.statusMessage));
+    (!app.weather && (app.isSearching || hasTransientStatus || !weatherStatusMessage));
   const weatherContentKey = app.weather
     ? `${app.weather.location.lat},${app.weather.location.lon},${app.weather.current.temperature},${app.weather.units}`
     : 'empty-weather-content';
-  const hasWeather = app.weather !== null;
+  const weatherData = app.weather;
+  const hasWeather = weatherData !== null;
 
   return (
     <main className="app-shell">
@@ -31,6 +36,7 @@ export const WeatherDashboard = () => {
           <p className="sidebar-kicker">Live Forecast</p>
           <h1 className="sidebar-title">City Search</h1>
         </header>
+        <StatusState message={searchStatusMessage} className="sidebar-status-message" />
         <SearchForm
           value={app.cityQuery}
           onChange={app.setCityQuery}
@@ -59,15 +65,15 @@ export const WeatherDashboard = () => {
           <h2 className="panel-title">Weather</h2>
           <p className="panel-subtitle">Current conditions and daily outlook</p>
         </header>
-        <StatusState message={app.statusMessage} />
+        <StatusState message={weatherStatusMessage} />
         <div className="weather-stage">
-          {hasWeather ? (
+          {weatherData ? (
             <div
               className={`weather-content weather-content-visible ${app.isLoadingWeather ? 'weather-content-loading' : ''}`}
               key={weatherContentKey}
             >
-              <CurrentWeatherPanel weather={app.weather} />
-              <ForecastGrid weather={app.weather} />
+              <CurrentWeatherPanel weather={weatherData} />
+              <ForecastGrid weather={weatherData} />
             </div>
           ) : null}
           {shouldShowSkeleton ? (

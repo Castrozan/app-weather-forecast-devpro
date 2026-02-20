@@ -342,6 +342,10 @@ input[type='radio']:focus-visible {
   background: var(--status-error-bg);
 }
 
+.sidebar-status-message {
+  margin: -4px 0 2px;
+}
+
 .weather-stage {
   position: relative;
   z-index: 1;
