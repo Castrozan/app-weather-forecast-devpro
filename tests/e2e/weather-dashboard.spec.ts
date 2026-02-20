@@ -367,8 +367,11 @@ test.describe('Weather dashboard', () => {
 
     await page.goto('/');
 
+    const searchInput = page.getByLabel('Search');
     await expect(page.locator('.current-city')).toHaveText('Las Vegas');
+    await expect(searchInput).toHaveValue('Las Vegas');
     await expect.poll(() => weatherRequestCities.includes('Near You')).toBe(true);
     await expect(page.locator('.current-city')).toHaveText('Near You');
+    await expect(searchInput).toHaveValue('Las Vegas');
   });
 });

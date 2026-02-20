@@ -209,7 +209,6 @@ export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherA
           const localCity = toLocalCityCandidate(coordinates.lat, coordinates.lon);
           setSelectedCity(localCity);
           setCandidateCities([]);
-          setCityQueryState(localCity.name);
           await loadWeatherForCity(localCity, units, {
             loadingMessage: 'Loading local weather...',
             preserveWeatherOnError: true,
