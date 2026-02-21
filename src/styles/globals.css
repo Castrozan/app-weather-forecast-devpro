@@ -141,7 +141,7 @@ button {
 .search-input:focus-visible,
 .button:focus-visible,
 .candidate-button:focus-visible,
-input[type='radio']:focus-visible {
+.unit-toggle-button:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
@@ -178,56 +178,33 @@ input[type='radio']:focus-visible {
   cursor: not-allowed;
 }
 
-.unit-toggle {
-  margin: 0;
-  border: 1px solid rgba(160, 218, 254, 0.24);
+.unit-toggle-button {
+  padding: 8px 20px;
   border-radius: 999px;
-  padding: 8px;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  color: var(--text-side);
+  border: 1px solid rgba(160, 218, 254, 0.36);
   background: rgba(14, 31, 48, 0.7);
-}
-
-.unit-legend {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  padding: 0 var(--space-2);
+  color: var(--text-main);
+  font-size: 15px;
   font-weight: 700;
-}
-
-.unit-option {
-  position: relative;
-  border-radius: 999px;
-  border: 1px solid transparent;
+  letter-spacing: 0.04em;
+  cursor: pointer;
   transition:
     background-color 120ms ease,
     border-color 120ms ease,
-    color 120ms ease;
-  min-width: 56px;
-  text-align: center;
-  color: var(--text-muted);
+    transform 120ms ease;
+  white-space: nowrap;
+  align-self: flex-start;
 }
 
-.unit-option span {
-  display: inline-block;
-  padding: 7px 12px;
-  font-weight: 600;
-}
-
-.unit-option input {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-}
-
-.unit-option-active {
-  color: var(--text-main);
-  border-color: rgba(175, 230, 255, 0.42);
+.unit-toggle-button:hover:not(:disabled) {
   background: rgba(31, 129, 193, 0.38);
+  border-color: rgba(175, 230, 255, 0.6);
+  transform: translateY(-1px);
+}
+
+.unit-toggle-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .candidate-list-wrapper {
@@ -344,6 +321,13 @@ input[type='radio']:focus-visible {
 .panel-header {
   position: relative;
   z-index: 1;
+}
+
+.panel-header-top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .panel-title {

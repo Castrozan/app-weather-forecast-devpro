@@ -36,13 +36,6 @@ export const WeatherDashboard = ({ defaultUnit }: WeatherDashboardProps) => {
           }}
           disabled={vm.controlsDisabled}
         />
-        <UnitToggle
-          value={app.units}
-          onChange={(unit) => {
-            void app.setUnits(unit);
-          }}
-          disabled={vm.controlsDisabled}
-        />
         <StatusState
           message={vm.searchStatusText ?? vm.weatherStatusText}
           isError={vm.searchStatusIsError || vm.weatherStatusIsError}
@@ -59,8 +52,19 @@ export const WeatherDashboard = ({ defaultUnit }: WeatherDashboardProps) => {
 
       <section className="weather-panel">
         <header className="panel-header">
-          <h2 className="panel-title">Weather</h2>
-          <p className="panel-subtitle">Current conditions and daily outlook</p>
+          <div className="panel-header-top-row">
+            <div>
+              <h2 className="panel-title">Weather</h2>
+              <p className="panel-subtitle">Current conditions and daily outlook</p>
+            </div>
+            <UnitToggle
+              value={app.units}
+              onChange={(unit) => {
+                void app.setUnits(unit);
+              }}
+              disabled={vm.controlsDisabled}
+            />
+          </div>
         </header>
         <div className="weather-stage">
           {vm.weatherData ? (

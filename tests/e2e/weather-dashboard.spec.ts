@@ -287,7 +287,7 @@ test.describe('Weather dashboard', () => {
     await expect(page.locator('.current-temp')).toContainText('22°C');
     await expect(page.locator('.forecast-card')).toHaveCount(5);
 
-    await page.getByRole('radio', { name: '°F' }).check();
+    await page.getByRole('button', { name: 'Switch to °F' }).click();
 
     await expect(page.locator('.current-temp')).toContainText('72°F');
     await expect.poll(() => weatherRequests).toBe(3);

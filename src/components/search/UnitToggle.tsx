@@ -9,31 +9,19 @@ type UnitToggleProps = {
 };
 
 export const UnitToggle = ({ value, onChange, disabled }: UnitToggleProps) => {
+  const nextUnit: TemperatureUnit = value === 'metric' ? 'imperial' : 'metric';
+  const currentLabel = value === 'metric' ? '°C' : '°F';
+  const nextLabel = value === 'metric' ? '°F' : '°C';
+
   return (
-    <fieldset className="unit-toggle" aria-label="Temperature unit">
-      <legend className="unit-legend">Units</legend>
-      <label className={`unit-option ${value === 'metric' ? 'unit-option-active' : ''}`}>
-        <input
-          type="radio"
-          name="units"
-          value="metric"
-          checked={value === 'metric'}
-          onChange={() => onChange('metric')}
-          disabled={disabled}
-        />
-        <span>°C</span>
-      </label>
-      <label className={`unit-option ${value === 'imperial' ? 'unit-option-active' : ''}`}>
-        <input
-          type="radio"
-          name="units"
-          value="imperial"
-          checked={value === 'imperial'}
-          onChange={() => onChange('imperial')}
-          disabled={disabled}
-        />
-        <span>°F</span>
-      </label>
-    </fieldset>
+    <button
+      className="unit-toggle-button"
+      onClick={() => onChange(nextUnit)}
+      disabled={disabled}
+      aria-label={`Switch to ${nextLabel}`}
+      title={`Switch to ${nextLabel}`}
+    >
+      {currentLabel}
+    </button>
   );
 };
