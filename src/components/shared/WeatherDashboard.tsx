@@ -15,9 +15,13 @@ import { StatusState } from './StatusState';
 export const WeatherDashboard = () => {
   const app = useWeatherApp();
   const searchStatusMessage =
-    app.statusMessage !== null && isSearchStatusMessage(app.statusMessage) ? app.statusMessage : null;
+    app.statusMessage !== null && isSearchStatusMessage(app.statusMessage)
+      ? app.statusMessage
+      : null;
   const weatherStatusMessage =
-    app.statusMessage !== null && !isSearchStatusMessage(app.statusMessage) ? app.statusMessage : null;
+    app.statusMessage !== null && !isSearchStatusMessage(app.statusMessage)
+      ? app.statusMessage
+      : null;
   const hasTransientStatus =
     weatherStatusMessage !== null && isTransientStatusMessage(weatherStatusMessage);
   const shouldShowSkeleton =
@@ -77,7 +81,9 @@ export const WeatherDashboard = () => {
             </div>
           ) : null}
           {shouldShowSkeleton ? (
-            <div className={`weather-skeleton-layer ${hasWeather ? 'weather-skeleton-overlay' : ''}`}>
+            <div
+              className={`weather-skeleton-layer ${hasWeather ? 'weather-skeleton-overlay' : ''}`}
+            >
               <WeatherPanelSkeleton />
             </div>
           ) : null}
