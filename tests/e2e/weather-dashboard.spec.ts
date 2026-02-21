@@ -276,9 +276,8 @@ test.describe('Weather dashboard', () => {
     await page.getByLabel('Search').fill('New York');
     await page.getByRole('button', { name: 'Find' }).click();
 
-    await expect(page.locator('.sidebar .status-message')).toContainText(
-      'Multiple matches found. Select the correct city.',
-    );
+    await expect(page.locator('.candidate-button').first()).toBeVisible();
+    await expect(page.locator('.sidebar .status-message')).toHaveCount(0);
     await expect(page.locator('.weather-panel .status-message')).toHaveCount(0);
 
     await page.locator('.candidate-button').first().click();

@@ -76,10 +76,7 @@ export const useWeatherSearch = (
       }
 
       setCandidateCities(cities);
-      setStatusMessage({
-        kind: 'search-info',
-        text: 'Multiple matches found. Select the correct city.',
-      });
+      setStatusMessage(null);
     } catch (error) {
       setCandidateCities([]);
       setStatusMessage({
