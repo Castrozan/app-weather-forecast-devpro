@@ -101,10 +101,8 @@ describe('buildWeatherDashboardViewModel', () => {
       expect(vm.weatherStatusIsError).toBe(true);
     });
 
-    it('marks weatherStatusIsError false for weather-loading kind', () => {
-      const vm = buildWeatherDashboardViewModel(
-        buildBaseAppState({ statusMessage: { kind: 'weather-loading', text: 'Loading...' } }),
-      );
+    it('marks weatherStatusIsError false for non-error weather status', () => {
+      const vm = buildWeatherDashboardViewModel(buildBaseAppState({ statusMessage: null }));
 
       expect(vm.weatherStatusIsError).toBe(false);
     });

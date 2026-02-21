@@ -11,7 +11,6 @@ import type { CityCandidate, TemperatureUnit, WeatherResponse } from '@/types/we
 const MIN_WEATHER_LOADING_DURATION_MS = 500;
 
 type LoadWeatherOptions = {
-  loadingMessage?: StatusMessage;
   preserveWeatherOnError?: boolean;
   suppressErrorStatus?: boolean;
 };
@@ -63,10 +62,6 @@ export const useWeatherLoader = (
       nextUnits: TemperatureUnit,
       options: LoadWeatherOptions = {},
     ): Promise<void> => {
-      setStatusMessage(
-        options.loadingMessage ?? { kind: 'weather-loading', text: 'Loading weather...' },
-      );
-
       try {
         const weatherData = await weatherMutation.mutateAsync({
           lat: city.lat,

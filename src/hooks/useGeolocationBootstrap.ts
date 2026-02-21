@@ -77,7 +77,6 @@ export const useGeolocationBootstrap = ({
           setSelectedCity(localCity);
           setCandidateCities([]);
           await loadWeatherForCityRef.current(localCity, currentUnitsRef.current, {
-            loadingMessage: { kind: 'weather-loading', text: 'Loading local weather...' },
             preserveWeatherOnError: true,
             suppressErrorStatus: true,
           });

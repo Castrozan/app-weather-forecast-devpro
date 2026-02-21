@@ -1,9 +1,4 @@
-export type StatusMessageKind =
-  | 'search-loading'
-  | 'search-info'
-  | 'search-error'
-  | 'weather-loading'
-  | 'weather-error';
+export type StatusMessageKind = 'search-loading' | 'search-info' | 'search-error' | 'weather-error';
 
 export type StatusMessage = {
   kind: StatusMessageKind;
@@ -19,7 +14,7 @@ export const isSearchStatusMessage = (message: StatusMessage): boolean => {
 };
 
 export const isTransientStatusMessage = (message: StatusMessage): boolean => {
-  return message.kind === 'search-loading' || message.kind === 'weather-loading';
+  return message.kind === 'search-loading';
 };
 
 export const isErrorStatusMessage = (message: StatusMessage): boolean => {

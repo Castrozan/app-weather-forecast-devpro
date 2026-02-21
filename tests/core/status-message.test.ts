@@ -10,8 +10,7 @@ import {
 const msg = (kind: StatusMessage['kind']): StatusMessage => ({ kind, text: '' });
 
 describe('status message helpers', () => {
-  it('classifies loading messages as transient', () => {
-    expect(isTransientStatusMessage(msg('weather-loading'))).toBe(true);
+  it('classifies search-loading as transient', () => {
     expect(isTransientStatusMessage(msg('search-loading'))).toBe(true);
   });
 
@@ -29,7 +28,6 @@ describe('status message helpers', () => {
   it('does not classify non-error kinds as error', () => {
     expect(isErrorStatusMessage(msg('search-info'))).toBe(false);
     expect(isErrorStatusMessage(msg('search-loading'))).toBe(false);
-    expect(isErrorStatusMessage(msg('weather-loading'))).toBe(false);
   });
 
   it('classifies search-scoped kinds as search status', () => {
@@ -38,8 +36,7 @@ describe('status message helpers', () => {
     expect(isSearchStatusMessage(msg('search-error'))).toBe(true);
   });
 
-  it('does not classify weather-scoped kinds as search status', () => {
-    expect(isSearchStatusMessage(msg('weather-loading'))).toBe(false);
+  it('does not classify weather-error as search status', () => {
     expect(isSearchStatusMessage(msg('weather-error'))).toBe(false);
   });
 });
