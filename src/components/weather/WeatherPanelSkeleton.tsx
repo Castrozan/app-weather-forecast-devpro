@@ -26,7 +26,7 @@ export const WeatherPanelSkeleton = () => {
       <section className="forecast-section weather-skeleton-forecast">
         <div className="forecast-header">
           <span className="skeleton-line skeleton-line-title" />
-          <span className="skeleton-line skeleton-line-subtitle" />
+          <span className="skeleton-line skeleton-toggle-pill" />
         </div>
         <div className="forecast-grid">
           {SKELETON_FORECAST_CARDS.map((day) => (

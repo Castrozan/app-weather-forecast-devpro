@@ -52,19 +52,8 @@ export const WeatherDashboard = ({ defaultUnit }: WeatherDashboardProps) => {
 
       <section className="weather-panel">
         <header className="panel-header">
-          <div className="panel-header-top-row">
-            <div>
-              <h2 className="panel-title">Weather</h2>
-              <p className="panel-subtitle">Current conditions and daily outlook</p>
-            </div>
-            <UnitToggle
-              value={app.units}
-              onChange={(unit) => {
-                void app.setUnits(unit);
-              }}
-              disabled={vm.controlsDisabled}
-            />
-          </div>
+          <h2 className="panel-title">Weather</h2>
+          <p className="panel-subtitle">Current conditions and daily outlook</p>
         </header>
         <div className="weather-stage">
           {vm.weatherData ? (
@@ -73,7 +62,18 @@ export const WeatherDashboard = ({ defaultUnit }: WeatherDashboardProps) => {
               key={vm.weatherContentKey}
             >
               <CurrentWeatherPanel weather={vm.weatherData} />
-              <ForecastGrid weather={vm.weatherData} />
+              <ForecastGrid
+                weather={vm.weatherData}
+                unitToggle={
+                  <UnitToggle
+                    value={app.units}
+                    onChange={(unit) => {
+                      void app.setUnits(unit);
+                    }}
+                    disabled={vm.controlsDisabled}
+                  />
+                }
+              />
             </div>
           ) : null}
           {vm.shouldShowSkeleton ? (
