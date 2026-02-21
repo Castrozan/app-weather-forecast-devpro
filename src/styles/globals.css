@@ -233,10 +233,11 @@ input[type='radio']:focus-visible {
 .candidate-list-wrapper {
   margin-top: 2px;
   min-height: 0;
-  flex: 1 1 auto;
+  flex: 1 1 0;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
   gap: 0;
+  overflow: hidden;
 }
 
 .candidate-list-title {
