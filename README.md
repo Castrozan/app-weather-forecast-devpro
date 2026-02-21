@@ -33,13 +33,14 @@ npm run dev
 
 Copy `.env.example` to `.env.local` and configure:
 
-| Variable                               | Default   | Description                                                          |
-| -------------------------------------- | --------- | -------------------------------------------------------------------- |
-| `APP_ACCESS_TOKEN`                     | _(empty)_ | When set, gates the app behind a token. Leave empty for open access. |
-| `RATE_LIMIT_WINDOW_MS`                 | `60000`   | Rate limit window in milliseconds per IP                             |
-| `RATE_LIMIT_MAX_REQUESTS`              | `60`      | Max requests per IP per window                                       |
-| `CACHE_TTL_SECONDS`                    | `300`     | Weather response cache TTL (0 = disabled)                            |
-| `NEXT_PUBLIC_DEFAULT_TEMPERATURE_UNIT` | `metric`  | Default unit: `metric` or `imperial`                                 |
+| Variable                               | Default   | Description                                                                     |
+| -------------------------------------- | --------- | ------------------------------------------------------------------------------- |
+| `OPENWEATHER_API_KEY`                  | _(empty)_ | OpenWeather API key. When set, OpenWeather is primary with Open-Meteo fallback. |
+| `APP_ACCESS_TOKEN`                     | _(empty)_ | When set, gates the app behind a token. Leave empty for open access.            |
+| `RATE_LIMIT_WINDOW_MS`                 | `60000`   | Rate limit window in milliseconds per IP                                        |
+| `RATE_LIMIT_MAX_REQUESTS`              | `60`      | Max requests per IP per window                                                  |
+| `CACHE_TTL_SECONDS`                    | `300`     | Weather response cache TTL (0 = disabled)                                       |
+| `NEXT_PUBLIC_DEFAULT_TEMPERATURE_UNIT` | `metric`  | Default unit: `metric` or `imperial`                                            |
 
 ## Quality Checks
 
@@ -123,9 +124,9 @@ tests/
 
 The API layer is thin and stateless (cache and rate limiter are in-memory per process). Keeping everything in one Next.js app removes operational overhead for a take-home scope. The hexagonal structure means `src/services/server/` can be extracted to a standalone Node service by swapping out the transport layer — routes become Express handlers, no domain logic changes.
 
-**2. Open-Meteo instead of OpenWeatherMap**
+**2. OpenWeather as primary provider, Open-Meteo as keyless fallback**
 
-Open-Meteo requires no API key, removing the need to manage key secrets in the submission environment. The `WeatherProviderPort` interface makes the provider swappable. Switching to OpenWeatherMap means writing a new adapter in `src/services/server/weather/adapters/` and updating `resolveWeatherProvider.ts` — one file.
+OpenWeather is the primary provider when `OPENWEATHER_API_KEY` is set, with Open-Meteo as automatic fallback. Without a key, Open-Meteo runs standalone — no configuration required for local development. The `WeatherProviderPort` interface makes providers swappable: adding a new one means writing an adapter in `src/services/server/weather/adapters/` and updating `resolveWeatherProvider.ts`.
 
 **3. In-memory cache and rate limiter**
 
