@@ -67,7 +67,9 @@ export const useGeolocationBootstrap = ({
   const hasAttemptedGeolocationRef = useRef(false);
 
   const loadWeatherForCityRef = useRef(loadWeatherForCity);
-  loadWeatherForCityRef.current = loadWeatherForCity;
+  useEffect(() => {
+    loadWeatherForCityRef.current = loadWeatherForCity;
+  }, [loadWeatherForCity]);
 
   useEffect(() => {
     let isMounted = true;
