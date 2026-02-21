@@ -1,13 +1,10 @@
+import { temperatureUnitSymbol } from '@/lib/weatherUnits';
 import type { ForecastDay, TemperatureUnit } from '@/types/weather';
 import { resolveWeatherIconClass } from './weatherIconClass';
 
 type ForecastCardProps = {
   forecast: ForecastDay;
   units: TemperatureUnit;
-};
-
-const unitSymbol = (units: TemperatureUnit): string => {
-  return units === 'metric' ? 'C' : 'F';
 };
 
 export const ForecastCard = ({ forecast, units }: ForecastCardProps) => {
@@ -20,10 +17,10 @@ export const ForecastCard = ({ forecast, units }: ForecastCardProps) => {
       <p className="forecast-description">{forecast.description}</p>
       <div className="forecast-minmax-grid">
         <p className="forecast-minmax">
-          Min {forecast.min}°{unitSymbol(units)}
+          Min {forecast.min}°{temperatureUnitSymbol(units)}
         </p>
         <p className="forecast-minmax">
-          Max {forecast.max}°{unitSymbol(units)}
+          Max {forecast.max}°{temperatureUnitSymbol(units)}
         </p>
       </div>
     </article>

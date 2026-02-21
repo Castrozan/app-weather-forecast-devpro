@@ -1,17 +1,10 @@
+import { temperatureUnitSymbol, windSpeedUnitLabel } from '@/lib/weatherUnits';
 import type { WeatherResponse } from '@/types/weather';
 
 import { resolveWeatherIconClass } from './weatherIconClass';
 
 type CurrentWeatherPanelProps = {
   weather: WeatherResponse;
-};
-
-const unitSymbol = (units: WeatherResponse['units']): string => {
-  return units === 'metric' ? 'C' : 'F';
-};
-
-const windSpeedUnit = (units: WeatherResponse['units']): string => {
-  return units === 'metric' ? 'km/h' : 'mph';
 };
 
 export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
@@ -34,7 +27,7 @@ export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
             />
           </span>
           <p className="current-temp">
-            {weather.current.temperature}°{unitSymbol(weather.units)}
+            {weather.current.temperature}°{temperatureUnitSymbol(weather.units)}
           </p>
         </div>
       </div>
@@ -42,13 +35,13 @@ export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
         <div className="current-stat">
           <dt>Min</dt>
           <dd>
-            {weather.current.min}°{unitSymbol(weather.units)}
+            {weather.current.min}°{temperatureUnitSymbol(weather.units)}
           </dd>
         </div>
         <div className="current-stat">
           <dt>Max</dt>
           <dd>
-            {weather.current.max}°{unitSymbol(weather.units)}
+            {weather.current.max}°{temperatureUnitSymbol(weather.units)}
           </dd>
         </div>
         <div className="current-stat">
@@ -58,7 +51,7 @@ export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
         <div className="current-stat">
           <dt>Wind</dt>
           <dd>
-            {weather.current.windSpeed} {windSpeedUnit(weather.units)}
+            {weather.current.windSpeed} {windSpeedUnitLabel(weather.units)}
           </dd>
         </div>
       </dl>
