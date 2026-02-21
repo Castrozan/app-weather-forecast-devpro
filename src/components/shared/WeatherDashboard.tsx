@@ -1,11 +1,7 @@
 'use client';
 
 import { useWeatherApp } from '@/hooks/useWeatherApp';
-import {
-  isErrorStatusMessage,
-  isSearchStatusMessage,
-  isTransientStatusMessage,
-} from '@/lib/statusMessage';
+import { buildWeatherDashboardViewModel } from '@/lib/weatherDashboardViewModel';
 import type { TemperatureUnit } from '@/types/weather';
 
 import { CityCandidatesList } from '../search/CityCandidatesList';
@@ -23,24 +19,7 @@ type WeatherDashboardProps = {
 
 export const WeatherDashboard = ({ defaultUnit }: WeatherDashboardProps) => {
   const app = useWeatherApp(defaultUnit);
-  const searchStatusMessage =
-    app.statusMessage !== null && isSearchStatusMessage(app.statusMessage)
-      ? app.statusMessage
-      : null;
-  const weatherStatusMessage =
-    app.statusMessage !== null && !isSearchStatusMessage(app.statusMessage)
-      ? app.statusMessage
-      : null;
-  const hasTransientStatus =
-    app.statusMessage !== null && isTransientStatusMessage(app.statusMessage);
-  const shouldShowSkeleton =
-    app.isLoadingWeather ||
-    (!app.weather && (app.isSearching || hasTransientStatus || !weatherStatusMessage));
-  const weatherContentKey = app.weather
-    ? `${app.weather.location.lat},${app.weather.location.lon},${app.weather.current.temperature},${app.weather.units}`
-    : 'empty-weather-content';
-  const weatherData = app.weather;
-  const hasWeather = weatherData !== null;
+  const vm = buildWeatherDashboardViewModel(app);
 
   return (
     <main className="app-shell">
@@ -55,18 +34,18 @@ export const WeatherDashboard = ({ defaultUnit }: WeatherDashboardProps) => {
           onSubmit={() => {
             void app.search();
           }}
-          disabled={app.isSearching || app.isLoadingWeather}
+          disabled={vm.controlsDisabled}
         />
         <UnitToggle
           value={app.units}
           onChange={(unit) => {
             void app.setUnits(unit);
           }}
-          disabled={app.isSearching || app.isLoadingWeather}
+          disabled={vm.controlsDisabled}
         />
         <StatusState
-          message={searchStatusMessage?.text ?? null}
-          isError={searchStatusMessage ? isErrorStatusMessage(searchStatusMessage) : false}
+          message={vm.searchStatusText}
+          isError={vm.searchStatusIsError}
           className="sidebar-status-message"
         />
         <CityCandidatesList
@@ -82,23 +61,20 @@ export const WeatherDashboard = ({ defaultUnit }: WeatherDashboardProps) => {
           <h2 className="panel-title">Weather</h2>
           <p className="panel-subtitle">Current conditions and daily outlook</p>
         </header>
-        <StatusState
-          message={weatherStatusMessage?.text ?? null}
-          isError={weatherStatusMessage ? isErrorStatusMessage(weatherStatusMessage) : false}
-        />
+        <StatusState message={vm.weatherStatusText} isError={vm.weatherStatusIsError} />
         <div className="weather-stage">
-          {weatherData ? (
+          {vm.weatherData ? (
             <div
               className={`weather-content weather-content-visible ${app.isLoadingWeather ? 'weather-content-loading' : ''}`}
-              key={weatherContentKey}
+              key={vm.weatherContentKey}
             >
-              <CurrentWeatherPanel weather={weatherData} />
-              <ForecastGrid weather={weatherData} />
+              <CurrentWeatherPanel weather={vm.weatherData} />
+              <ForecastGrid weather={vm.weatherData} />
             </div>
           ) : null}
-          {shouldShowSkeleton ? (
+          {vm.shouldShowSkeleton ? (
             <div
-              className={`weather-skeleton-layer ${hasWeather ? 'weather-skeleton-overlay' : ''}`}
+              className={`weather-skeleton-layer ${vm.shouldShowSkeletonAsOverlay ? 'weather-skeleton-overlay' : ''}`}
             >
               <WeatherPanelSkeleton />
             </div>
