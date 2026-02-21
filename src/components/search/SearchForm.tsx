@@ -16,15 +16,13 @@ export const SearchForm = ({ value, onChange, onSubmit, disabled }: SearchFormPr
         onSubmit();
       }}
     >
-      <label className="search-label" htmlFor="city-search">
-        Search
-      </label>
       <input
         id="city-search"
         name="city"
         type="text"
         placeholder="Try New York"
         autoComplete="off"
+        aria-label="Search"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         disabled={disabled}

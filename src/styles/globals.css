@@ -1,7 +1,10 @@
 @import './tokens.css';
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+  min-width: 0;
 }
 
 html,
@@ -12,6 +15,7 @@ body {
 
 body {
   min-height: 100vh;
+  padding: 24px;
   color: var(--text-main);
   font-size: 15px;
   font-family: var(--font-body), 'Noto Sans', sans-serif;
@@ -19,7 +23,6 @@ body {
     radial-gradient(circle at 10% 16%, var(--page-overlay) 0%, transparent 43%),
     radial-gradient(circle at 82% 8%, rgba(66, 183, 239, 0.24) 0%, transparent 42%),
     linear-gradient(140deg, #060a12 0%, var(--page-bg) 52%, #051731 100%);
-  overflow-x: hidden;
 }
 
 body::before,
@@ -62,8 +65,8 @@ button {
 
 .app-shell {
   width: min(1180px, 94vw);
-  min-height: min(840px, calc(100vh - 48px));
-  margin: 24px auto;
+  height: min(840px, calc(100vh - 48px));
+  margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
   border: 1px solid var(--surface-border);
@@ -220,7 +223,6 @@ button {
 .candidate-list-title {
   margin: 0;
   font-size: 13px;
-  text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--text-muted);
 }
@@ -233,7 +235,7 @@ button {
 
 .candidate-list {
   margin: 12px 0 0;
-  padding: 0;
+  padding: 4px;
   list-style: none;
   display: grid;
   gap: 8px;
@@ -246,7 +248,6 @@ button {
   scrollbar-gutter: stable;
   scrollbar-width: thin;
   scrollbar-color: rgba(173, 226, 255, 0.42) rgba(6, 19, 32, 0.28);
-  padding-right: 8px;
 }
 
 .candidate-list::-webkit-scrollbar {
@@ -301,6 +302,7 @@ button {
   position: relative;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
   padding: 32px 30px 24px;
   background:
     linear-gradient(160deg, var(--surface-main) 0%, var(--surface-main-strong) 100%),
@@ -565,15 +567,19 @@ button {
   margin: 4px 0 0;
   font-family: var(--font-body), 'Inter', sans-serif;
   font-size: clamp(40px, 6vw, 74px);
-  line-height: 0.9;
+  line-height: 1.25;
   font-weight: 700;
   letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .current-temperature {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .current-temp {
@@ -647,10 +653,16 @@ button {
 }
 
 .forecast-grid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 12px;
   margin-top: 2px;
+}
+
+.forecast-card {
+  flex: 1 1 calc(20% - 10px);
+  min-width: 120px;
 }
 
 .forecast-card {
@@ -869,20 +881,23 @@ button {
 }
 
 @media (max-width: 1080px) {
-  .forecast-grid {
-    grid-template-columns: repeat(3, minmax(120px, 1fr));
+  .forecast-card {
+    flex: 0 1 calc(33.333% - 8px);
+    max-width: calc(33.333% - 8px);
   }
 
   .current-main {
     align-items: flex-start;
     flex-direction: column;
   }
+
 }
 
 @media (max-width: 920px) {
   .app-shell {
     grid-template-columns: 1fr;
-    min-height: unset;
+    height: auto;
+    overflow: visible;
     width: min(940px, 94vw);
   }
 
@@ -904,8 +919,9 @@ button {
 }
 
 @media (max-width: 760px) {
-  .forecast-grid {
-    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  .forecast-card {
+    flex: 0 1 calc(50% - 6px);
+    max-width: calc(50% - 6px);
   }
 
   .forecast-header {
@@ -934,10 +950,6 @@ button {
 
   .sidebar-title {
     font-size: clamp(34px, 10vw, 54px);
-  }
-
-  .forecast-grid {
-    grid-template-columns: 1fr 1fr;
   }
 
   .current-city {

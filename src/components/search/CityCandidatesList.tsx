@@ -14,8 +14,7 @@ export const CityCandidatesList = ({ cities, onSelect }: CityCandidatesListProps
 
   return (
     <div className="candidate-list-wrapper">
-      <p className="candidate-list-title">Select city</p>
-      <p className="candidate-list-subtitle">Pick the exact location below.</p>
+      <p className="candidate-list-title">Which one?</p>
       <ul className="candidate-list">
         {cities.map((city) => (
           <li key={city.id}>
