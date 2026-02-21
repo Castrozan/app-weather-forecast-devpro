@@ -57,6 +57,11 @@ const getPermissionState = async (
   }
 };
 
+export const queryGeolocationPermission = async (): Promise<PermissionStateLike | null> => {
+  const runtime = getDefaultRuntime();
+  return getPermissionState(runtime.permissions);
+};
+
 export const requestUserCoordinates = async (
   runtime: GeolocationRuntime = getDefaultRuntime(),
 ): Promise<UserCoordinates | null> => {

@@ -3,7 +3,10 @@
 import { useEffect, useRef } from 'react';
 
 import { DEFAULT_CITY } from '@/lib/defaultCity';
-import { requestUserCoordinates } from '@/services/client/location/requestUserCoordinates';
+import {
+  queryGeolocationPermission,
+  requestUserCoordinates,
+} from '@/services/client/location/requestUserCoordinates';
 import type { CityCandidate, TemperatureUnit } from '@/types/weather';
 
 const LOCAL_CITY_NAME = 'Near You';
@@ -33,6 +36,26 @@ type GeolocationBootstrapDependencies = {
   ) => Promise<void>;
 };
 
+const loadLocalWeather = async (
+  loadWeatherForCity: GeolocationBootstrapDependencies['loadWeatherForCity'],
+  setSelectedCity: GeolocationBootstrapDependencies['setSelectedCity'],
+  setCandidateCities: GeolocationBootstrapDependencies['setCandidateCities'],
+  currentUnitsRef: GeolocationBootstrapDependencies['currentUnitsRef'],
+  options?: { preserveWeatherOnError?: boolean },
+): Promise<boolean> => {
+  const coordinates = await requestUserCoordinates();
+
+  if (!coordinates) {
+    return false;
+  }
+
+  const localCity = toLocalCityCandidate(coordinates.lat, coordinates.lon);
+  setSelectedCity(localCity);
+  setCandidateCities([]);
+  await loadWeatherForCity(localCity, currentUnitsRef.current, options);
+  return true;
+};
+
 export const useGeolocationBootstrap = ({
   currentUnitsRef,
   hasUserInteractionRef,
@@ -41,7 +64,6 @@ export const useGeolocationBootstrap = ({
   loadWeatherForCity,
 }: GeolocationBootstrapDependencies): void => {
   const hasInitializedRef = useRef(false);
-  const hasLoadedDefaultWeatherRef = useRef(false);
   const hasAttemptedGeolocationRef = useRef(false);
 
   const loadWeatherForCityRef = useRef(loadWeatherForCity);
@@ -64,36 +86,56 @@ export const useGeolocationBootstrap = ({
         hasAttemptedGeolocationRef.current = true;
 
         void (async () => {
-          const coordinates = await requestUserCoordinates();
-
-          if (!coordinates || hasUserInteractionRef.current) {
+          if (hasUserInteractionRef.current) {
             return;
           }
 
-          const localCity = toLocalCityCandidate(coordinates.lat, coordinates.lon);
-          setSelectedCity(localCity);
-          setCandidateCities([]);
-          await loadWeatherForCityRef.current(localCity, currentUnitsRef.current, {
-            preserveWeatherOnError: true,
-          });
+          const succeeded = await loadLocalWeather(
+            loadWeatherForCityRef.current,
+            setSelectedCity,
+            setCandidateCities,
+            currentUnitsRef,
+            { preserveWeatherOnError: true },
+          );
+
+          if (!succeeded) {
+            return;
+          }
         })();
       }, LAZY_GEOLOCATION_DELAY_MS);
     };
 
     const initialize = async () => {
-      if (!hasInitializedRef.current) {
-        hasInitializedRef.current = true;
-        setSelectedCity(DEFAULT_CITY);
-        setCandidateCities([]);
+      if (hasInitializedRef.current) {
+        return;
+      }
 
-        try {
-          await loadWeatherForCityRef.current(DEFAULT_CITY, currentUnitsRef.current);
-        } finally {
-          hasLoadedDefaultWeatherRef.current = true;
+      hasInitializedRef.current = true;
+
+      const permissionState = await queryGeolocationPermission();
+      const locationAlreadyGranted = permissionState === 'granted';
+
+      if (locationAlreadyGranted) {
+        hasAttemptedGeolocationRef.current = true;
+        const succeeded = await loadLocalWeather(
+          loadWeatherForCityRef.current,
+          setSelectedCity,
+          setCandidateCities,
+          currentUnitsRef,
+        );
+
+        if (succeeded) {
+          return;
         }
       }
 
-      scheduleGeolocationAttempt();
+      setSelectedCity(DEFAULT_CITY);
+      setCandidateCities([]);
+      await loadWeatherForCityRef.current(DEFAULT_CITY, currentUnitsRef.current);
+
+      if (!locationAlreadyGranted) {
+        scheduleGeolocationAttempt();
+      }
     };
 
     void initialize();
