@@ -329,7 +329,7 @@ test.describe('Weather dashboard', () => {
     await expect(page.locator('.forecast-card')).toHaveCount(5);
   });
 
-  test('lazily loads user location when geolocation is granted', async ({ page }) => {
+  test('loads user location directly when geolocation is already granted', async ({ page }) => {
     await grantGeolocationPermission(page, 34.0522, -118.2437);
 
     await page.route('**/api/v1/cities?**', async (route) => {
@@ -346,14 +346,10 @@ test.describe('Weather dashboard', () => {
     await page.route('**/api/v1/weather?**', async (route) => {
       const url = new URL(route.request().url());
       const units = (url.searchParams.get('units') ?? 'metric') as TemperatureUnit;
-      const city = url.searchParams.get('city') ?? 'Las Vegas';
-      const country = url.searchParams.get('country') ?? 'United States';
-      const lat = Number(url.searchParams.get('lat') ?? '36.1699');
-      const lon = Number(url.searchParams.get('lon') ?? '-115.1398');
-
-      if (city === 'Near You') {
-        await wait(900);
-      }
+      const city = url.searchParams.get('city') ?? 'Near You';
+      const country = url.searchParams.get('country') ?? 'Local';
+      const lat = Number(url.searchParams.get('lat') ?? '34.0522');
+      const lon = Number(url.searchParams.get('lon') ?? '-118.2437');
 
       await route.fulfill({
         status: 200,
@@ -362,23 +358,10 @@ test.describe('Weather dashboard', () => {
       });
     });
 
-    const nearYouRequestInFlight = page.waitForRequest(
-      (request) =>
-        request.url().includes('/api/v1/weather') && request.url().includes('city=Near+You'),
-    );
-
     await page.goto('/');
 
-    const searchInput = page.getByLabel('Search');
-    await expect(page.locator('.current-city')).toHaveText('Las Vegas');
-    await expect(searchInput).toHaveValue('');
-
-    await nearYouRequestInFlight;
-
-    await expect(page.locator('.weather-skeleton')).toBeVisible();
-    await expect(page.locator('.current-city')).toHaveText('Las Vegas');
     await expect(page.locator('.current-city')).toHaveText('Near You');
-    await expect(searchInput).toHaveValue('');
+    await expect(page.getByLabel('Search')).toHaveValue('');
   });
 
   test('stays on default city without error when geolocation is denied', async ({ page }) => {

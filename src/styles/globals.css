@@ -327,7 +327,7 @@ button {
 
 .panel-header-top-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
@@ -628,6 +628,7 @@ button {
   z-index: 1;
   display: grid;
   gap: 10px;
+  margin-top: 8px;
 }
 
 .forecast-header {

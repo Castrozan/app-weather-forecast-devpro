@@ -10,9 +10,12 @@ const weekdayFormatter = new Intl.DateTimeFormat('en-US', {
   timeZone: 'UTC',
 });
 
-const mapDateToLabel = (date: string): string => {
-  const weekday = weekdayFormatter.format(new Date(`${date}T00:00:00Z`));
-  return weekday;
+const mapDateToLabel = (date: string, index: number): string => {
+  if (index === 0) {
+    return 'Tomorrow';
+  }
+
+  return weekdayFormatter.format(new Date(`${date}T00:00:00Z`));
 };
 
 const weatherCache = createInMemoryTtlCache<WeatherResponse>();
@@ -77,9 +80,9 @@ export const getWeatherByCoordinates = async (
     weatherData.forecastEntries,
     weatherData.timezoneOffsetSeconds,
     5,
-  ).map((day) => ({
+  ).map((day, index) => ({
     ...day,
-    label: mapDateToLabel(day.date),
+    label: mapDateToLabel(day.date, index),
   }));
 
   const response: WeatherResponse = {
