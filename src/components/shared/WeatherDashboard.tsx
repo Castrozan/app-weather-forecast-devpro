@@ -17,9 +17,11 @@ import { WeatherPanelSkeleton } from '../weather/WeatherPanelSkeleton';
 import { Disclaimer } from './Disclaimer';
 import { StatusState } from './StatusState';
 
-export const WeatherDashboard = () => {
-  const defaultUnit =
-    (process.env.NEXT_PUBLIC_DEFAULT_TEMPERATURE_UNIT as TemperatureUnit | undefined) ?? 'metric';
+type WeatherDashboardProps = {
+  defaultUnit: TemperatureUnit;
+};
+
+export const WeatherDashboard = ({ defaultUnit }: WeatherDashboardProps) => {
   const app = useWeatherApp(defaultUnit);
   const searchStatusMessage =
     app.statusMessage !== null && isSearchStatusMessage(app.statusMessage)

@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { WeatherDashboard } from '@/components/shared/WeatherDashboard';
-import { appConfig } from '@/lib/config';
+import { appConfig, clientConfig } from '@/lib/config';
 import { APP_SESSION_COOKIE, isValidAccessToken } from '@/services/server/security/accessToken';
 
 export default async function Home() {
@@ -15,5 +15,5 @@ export default async function Home() {
     }
   }
 
-  return <WeatherDashboard />;
+  return <WeatherDashboard defaultUnit={clientConfig.defaultTemperatureUnit} />;
 }
