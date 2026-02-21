@@ -10,7 +10,7 @@ import { UnitToggle } from '../search/UnitToggle';
 import { ForecastGrid } from '../weather/ForecastGrid';
 import { CurrentWeatherPanel } from '../weather/CurrentWeatherPanel';
 import { WeatherPanelSkeleton } from '../weather/WeatherPanelSkeleton';
-import { Disclaimer } from './Disclaimer';
+import { SidebarDisclaimer, PanelDisclaimer } from './Disclaimer';
 import { StatusState } from './StatusState';
 
 type WeatherDashboardProps = {
@@ -54,6 +54,7 @@ export const WeatherDashboard = ({ defaultUnit }: WeatherDashboardProps) => {
             void app.selectCity(city);
           }}
         />
+        <SidebarDisclaimer />
       </aside>
 
       <section className="weather-panel">
@@ -79,7 +80,7 @@ export const WeatherDashboard = ({ defaultUnit }: WeatherDashboardProps) => {
             </div>
           ) : null}
         </div>
-        <Disclaimer />
+        <PanelDisclaimer />
       </section>
     </main>
   );
