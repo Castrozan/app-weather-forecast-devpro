@@ -33,9 +33,11 @@ export const WeatherPanelSkeleton = () => {
             <article className="forecast-card weather-skeleton-card" key={day}>
               <span className="skeleton-line skeleton-line-label" />
               <span className="forecast-icon weather-skeleton-icon-sm" />
-              <span className="skeleton-line skeleton-line-small" />
-              <span className="skeleton-line skeleton-line-small" />
-              <span className="skeleton-line skeleton-line-small" />
+              <span className="skeleton-line skeleton-line-description" />
+              <div className="forecast-minmax-grid weather-skeleton-minmax-grid">
+                <span className="skeleton-line weather-skeleton-minmax" />
+                <span className="skeleton-line weather-skeleton-minmax" />
+              </div>
             </article>
           ))}
         </div>

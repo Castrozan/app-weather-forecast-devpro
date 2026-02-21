@@ -36,7 +36,6 @@ export const WeatherDashboard = () => {
           <p className="sidebar-kicker">Live Forecast</p>
           <h1 className="sidebar-title">City Search</h1>
         </header>
-        <StatusState message={searchStatusMessage} className="sidebar-status-message" />
         <SearchForm
           value={app.cityQuery}
           onChange={app.setCityQuery}
@@ -52,6 +51,7 @@ export const WeatherDashboard = () => {
           }}
           disabled={app.isSearching || app.isLoadingWeather}
         />
+        <StatusState message={searchStatusMessage} className="sidebar-status-message" />
         <CityCandidatesList
           cities={app.candidateCities}
           onSelect={(city) => {
