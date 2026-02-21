@@ -3,7 +3,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
-import type { StatusMessage } from '@/lib/statusMessage';
 import { weatherApiClient } from '@/services/client/weatherApiClient';
 import type { CityCandidate, TemperatureUnit } from '@/types/weather';
 
@@ -12,6 +11,7 @@ export type WeatherSearchState = {
   candidateCities: CityCandidate[];
   selectedCity: CityCandidate | null;
   isSearching: boolean;
+  searchError: string | null;
   hasUserInteractionRef: React.MutableRefObject<boolean>;
   setCityQuery: (value: string) => void;
   setSelectedCity: (city: CityCandidate) => void;
@@ -22,12 +22,12 @@ export type WeatherSearchState = {
 
 export const useWeatherSearch = (
   units: TemperatureUnit,
-  setStatusMessage: (message: StatusMessage | null) => void,
   loadWeatherForCity: (city: CityCandidate, nextUnits: TemperatureUnit) => Promise<void>,
 ): WeatherSearchState => {
   const [cityQueryState, setCityQueryState] = useState('');
   const [candidateCities, setCandidateCities] = useState<CityCandidate[]>([]);
   const [selectedCity, setSelectedCity] = useState<CityCandidate | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const hasUserInteractionRef = useRef(false);
 
   const searchMutation = useMutation({
@@ -55,18 +55,15 @@ export const useWeatherSearch = (
     const query = cityQueryState.trim();
 
     if (!query) {
-      setStatusMessage({ kind: 'search-info', text: 'Enter a city name to search.' });
       return;
     }
 
-    setStatusMessage({ kind: 'search-loading', text: 'Searching cities...' });
-
     try {
       const cities = await searchMutation.mutateAsync(query);
+      setSearchError(null);
 
       if (cities.length === 0) {
         setCandidateCities([]);
-        setStatusMessage({ kind: 'search-error', text: 'No city found for this query.' });
         return;
       }
 
@@ -76,21 +73,18 @@ export const useWeatherSearch = (
       }
 
       setCandidateCities(cities);
-      setStatusMessage(null);
     } catch (error) {
+      setSearchError(error instanceof Error ? error.message : 'City search failed.');
       setCandidateCities([]);
-      setStatusMessage({
-        kind: 'search-error',
-        text: error instanceof Error ? error.message : 'Failed to search cities.',
-      });
     }
-  }, [cityQueryState, searchMutation, selectCity, setStatusMessage]);
+  }, [cityQueryState, searchMutation, selectCity]);
 
   return {
     cityQuery: cityQueryState,
     candidateCities,
     selectedCity,
     isSearching: searchMutation.isPending,
+    searchError,
     hasUserInteractionRef,
     setCityQuery,
     setSelectedCity,

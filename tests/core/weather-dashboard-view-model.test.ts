@@ -25,7 +25,8 @@ const buildBaseAppState = (overrides: Partial<WeatherAppState> = {}): WeatherApp
   candidateCities: [],
   units: 'metric',
   weather: null,
-  statusMessage: null,
+  weatherError: null,
+  searchError: null,
   isSearching: false,
   isLoadingWeather: false,
   setCityQuery: () => undefined,
@@ -56,58 +57,6 @@ describe('buildWeatherDashboardViewModel', () => {
     });
   });
 
-  describe('search status message routing', () => {
-    it('exposes search status text when statusMessage is search-scoped', () => {
-      const vm = buildWeatherDashboardViewModel(
-        buildBaseAppState({ statusMessage: { kind: 'search-info', text: 'Multiple matches.' } }),
-      );
-
-      expect(vm.searchStatusText).toBe('Multiple matches.');
-      expect(vm.weatherStatusText).toBeNull();
-    });
-
-    it('marks searchStatusIsError true for search-error kind', () => {
-      const vm = buildWeatherDashboardViewModel(
-        buildBaseAppState({ statusMessage: { kind: 'search-error', text: 'No city found.' } }),
-      );
-
-      expect(vm.searchStatusIsError).toBe(true);
-    });
-
-    it('marks searchStatusIsError false for search-info kind', () => {
-      const vm = buildWeatherDashboardViewModel(
-        buildBaseAppState({ statusMessage: { kind: 'search-info', text: 'Select a city.' } }),
-      );
-
-      expect(vm.searchStatusIsError).toBe(false);
-    });
-  });
-
-  describe('weather status message routing', () => {
-    it('exposes weather status text when statusMessage is weather-scoped', () => {
-      const vm = buildWeatherDashboardViewModel(
-        buildBaseAppState({ statusMessage: { kind: 'weather-error', text: 'API error.' } }),
-      );
-
-      expect(vm.weatherStatusText).toBe('API error.');
-      expect(vm.searchStatusText).toBeNull();
-    });
-
-    it('marks weatherStatusIsError true for weather-error kind', () => {
-      const vm = buildWeatherDashboardViewModel(
-        buildBaseAppState({ statusMessage: { kind: 'weather-error', text: 'Failed.' } }),
-      );
-
-      expect(vm.weatherStatusIsError).toBe(true);
-    });
-
-    it('marks weatherStatusIsError false for non-error weather status', () => {
-      const vm = buildWeatherDashboardViewModel(buildBaseAppState({ statusMessage: null }));
-
-      expect(vm.weatherStatusIsError).toBe(false);
-    });
-  });
-
   describe('shouldShowSkeleton', () => {
     it('is true when isLoadingWeather is true even with existing weather', () => {
       const vm = buildWeatherDashboardViewModel(
@@ -125,16 +74,8 @@ describe('buildWeatherDashboardViewModel', () => {
       expect(vm.shouldShowSkeleton).toBe(false);
     });
 
-    it('is true when no weather and no error status (initial state)', () => {
+    it('is false when no weather and not loading or searching (error state)', () => {
       const vm = buildWeatherDashboardViewModel(buildBaseAppState());
-
-      expect(vm.shouldShowSkeleton).toBe(true);
-    });
-
-    it('is false when no weather but a weather-error status exists', () => {
-      const vm = buildWeatherDashboardViewModel(
-        buildBaseAppState({ statusMessage: { kind: 'weather-error', text: 'Failed.' } }),
-      );
 
       expect(vm.shouldShowSkeleton).toBe(false);
     });
@@ -174,6 +115,41 @@ describe('buildWeatherDashboardViewModel', () => {
       const vm = buildWeatherDashboardViewModel(buildBaseAppState());
 
       expect(vm.weatherContentKey).toBe('empty-weather-content');
+    });
+  });
+
+  describe('activeErrorMessage', () => {
+    it('is null when no errors are present', () => {
+      const vm = buildWeatherDashboardViewModel(buildBaseAppState());
+
+      expect(vm.activeErrorMessage).toBeNull();
+    });
+
+    it('returns weatherError when only weather failed', () => {
+      const vm = buildWeatherDashboardViewModel(
+        buildBaseAppState({ weatherError: 'Weather service unavailable.' }),
+      );
+
+      expect(vm.activeErrorMessage).toBe('Weather service unavailable.');
+    });
+
+    it('returns searchError when only city search failed', () => {
+      const vm = buildWeatherDashboardViewModel(
+        buildBaseAppState({ searchError: 'City search service unavailable.' }),
+      );
+
+      expect(vm.activeErrorMessage).toBe('City search service unavailable.');
+    });
+
+    it('gives searchError priority over weatherError when both are set', () => {
+      const vm = buildWeatherDashboardViewModel(
+        buildBaseAppState({
+          searchError: 'City search service unavailable.',
+          weatherError: 'Weather service unavailable.',
+        }),
+      );
+
+      expect(vm.activeErrorMessage).toBe('City search service unavailable.');
     });
   });
 });

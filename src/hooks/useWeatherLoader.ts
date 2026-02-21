@@ -4,7 +4,6 @@ import { useCallback, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
 import { withMinimumDuration } from '@/lib/minimumDuration';
-import type { StatusMessage } from '@/lib/statusMessage';
 import { weatherApiClient } from '@/services/client/weatherApiClient';
 import type { CityCandidate, TemperatureUnit, WeatherResponse } from '@/types/weather';
 
@@ -12,11 +11,11 @@ const MIN_WEATHER_LOADING_DURATION_MS = 500;
 
 type LoadWeatherOptions = {
   preserveWeatherOnError?: boolean;
-  suppressErrorStatus?: boolean;
 };
 
 export type WeatherLoaderState = {
   weather: WeatherResponse | null;
+  weatherError: string | null;
   units: TemperatureUnit;
   isLoadingWeather: boolean;
   currentUnitsRef: React.MutableRefObject<TemperatureUnit>;
@@ -28,11 +27,9 @@ export type WeatherLoaderState = {
   setUnits: (nextUnit: TemperatureUnit, selectedCity: CityCandidate | null) => Promise<void>;
 };
 
-export const useWeatherLoader = (
-  defaultUnit: TemperatureUnit,
-  setStatusMessage: (message: StatusMessage | null) => void,
-): WeatherLoaderState => {
+export const useWeatherLoader = (defaultUnit: TemperatureUnit): WeatherLoaderState => {
   const [weather, setWeather] = useState<WeatherResponse | null>(null);
+  const [weatherError, setWeatherError] = useState<string | null>(null);
   const [units, setUnitsState] = useState<TemperatureUnit>(defaultUnit);
   const currentUnitsRef = useRef<TemperatureUnit>(defaultUnit);
 
@@ -71,21 +68,15 @@ export const useWeatherLoader = (
           country: city.country,
         });
         setWeather(weatherData);
-        setStatusMessage(null);
+        setWeatherError(null);
       } catch (error) {
+        setWeatherError(error instanceof Error ? error.message : 'Failed to load weather data.');
         if (!options.preserveWeatherOnError) {
           setWeather(null);
         }
-
-        if (!options.suppressErrorStatus) {
-          setStatusMessage({
-            kind: 'weather-error',
-            text: error instanceof Error ? error.message : 'Failed to load weather data.',
-          });
-        }
       }
     },
-    [weatherMutation, setStatusMessage],
+    [weatherMutation],
   );
 
   const setUnits = async (
@@ -104,6 +95,7 @@ export const useWeatherLoader = (
 
   return {
     weather,
+    weatherError,
     units,
     isLoadingWeather: weatherMutation.isPending,
     currentUnitsRef,

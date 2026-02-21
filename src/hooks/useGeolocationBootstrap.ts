@@ -3,7 +3,6 @@
 import { useEffect, useRef } from 'react';
 
 import { DEFAULT_CITY } from '@/lib/defaultCity';
-import type { StatusMessage } from '@/lib/statusMessage';
 import { requestUserCoordinates } from '@/services/client/location/requestUserCoordinates';
 import type { CityCandidate, TemperatureUnit } from '@/types/weather';
 
@@ -29,9 +28,7 @@ type GeolocationBootstrapDependencies = {
     city: CityCandidate,
     nextUnits: TemperatureUnit,
     options?: {
-      loadingMessage?: StatusMessage;
       preserveWeatherOnError?: boolean;
-      suppressErrorStatus?: boolean;
     },
   ) => Promise<void>;
 };
@@ -78,7 +75,6 @@ export const useGeolocationBootstrap = ({
           setCandidateCities([]);
           await loadWeatherForCityRef.current(localCity, currentUnitsRef.current, {
             preserveWeatherOnError: true,
-            suppressErrorStatus: true,
           });
         })();
       }, LAZY_GEOLOCATION_DELAY_MS);

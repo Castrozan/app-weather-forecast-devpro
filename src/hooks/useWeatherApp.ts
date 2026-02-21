@@ -1,8 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-
-import type { StatusMessage } from '@/lib/statusMessage';
 import type { CityCandidate, TemperatureUnit, WeatherResponse } from '@/types/weather';
 
 import { useGeolocationBootstrap } from './useGeolocationBootstrap';
@@ -15,7 +12,8 @@ export type WeatherAppState = {
   candidateCities: CityCandidate[];
   units: TemperatureUnit;
   weather: WeatherResponse | null;
-  statusMessage: StatusMessage | null;
+  weatherError: string | null;
+  searchError: string | null;
   isSearching: boolean;
   isLoadingWeather: boolean;
   setCityQuery: (value: string) => void;
@@ -25,11 +23,9 @@ export type WeatherAppState = {
 };
 
 export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherAppState => {
-  const [statusMessage, setStatusMessage] = useState<StatusMessage | null>(null);
+  const loader = useWeatherLoader(defaultUnit);
 
-  const loader = useWeatherLoader(defaultUnit, setStatusMessage);
-
-  const searchState = useWeatherSearch(loader.units, setStatusMessage, loader.loadWeatherForCity);
+  const searchState = useWeatherSearch(loader.units, loader.loadWeatherForCity);
 
   useGeolocationBootstrap({
     currentUnitsRef: loader.currentUnitsRef,
@@ -45,7 +41,8 @@ export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherA
     candidateCities: searchState.candidateCities,
     units: loader.units,
     weather: loader.weather,
-    statusMessage,
+    weatherError: loader.weatherError,
+    searchError: searchState.searchError,
     isSearching: searchState.isSearching,
     isLoadingWeather: loader.isLoadingWeather,
     setCityQuery: searchState.setCityQuery,

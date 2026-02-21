@@ -216,7 +216,6 @@ test.describe('Weather dashboard', () => {
     await page.goto('/');
 
     await expect(page.locator('.weather-skeleton')).toBeVisible();
-    await expect(page.locator('.status-message')).toHaveCount(0);
     await expect(page.locator('.current-city')).toHaveText('Las Vegas');
     await expect(page.locator('.weather-content-visible')).toBeVisible();
     await expect(page.locator('.weather-skeleton')).toHaveCount(0);
@@ -277,8 +276,6 @@ test.describe('Weather dashboard', () => {
     await page.getByRole('button', { name: 'Find' }).click();
 
     await expect(page.locator('.candidate-button').first()).toBeVisible();
-    await expect(page.locator('.sidebar .status-message')).toHaveCount(0);
-    await expect(page.locator('.weather-panel .status-message')).toHaveCount(0);
 
     await page.locator('.candidate-button').first().click();
 
@@ -328,10 +325,6 @@ test.describe('Weather dashboard', () => {
     await page.getByLabel('Search').fill('Atlantis');
     await page.getByRole('button', { name: 'Find' }).click();
 
-    await expect(page.locator('.sidebar .status-message')).toContainText(
-      'No city found for this query.',
-    );
-    await expect(page.locator('.weather-panel .status-message')).toHaveCount(0);
     await expect(page.locator('.current-city')).toHaveText('Las Vegas');
     await expect(page.locator('.forecast-card')).toHaveCount(5);
   });
@@ -410,8 +403,6 @@ test.describe('Weather dashboard', () => {
 
     await expect(page.locator('.current-city')).toHaveText('Las Vegas');
     await expect(page.locator('.weather-content-visible')).toBeVisible();
-    await expect(page.locator('.status-message')).toHaveCount(0);
-    await expect(page.locator('.weather-panel .status-message')).toHaveCount(0);
   });
 
   test('auto-selects city and loads weather when search returns exactly one result', async ({
@@ -456,7 +447,6 @@ test.describe('Weather dashboard', () => {
 
     await expect(page.locator('.current-city')).toHaveText('New York');
     await expect(page.locator('.candidate-button')).toHaveCount(0);
-    await expect(page.locator('.sidebar .status-message')).toHaveCount(0);
     await expect(page.locator('.forecast-card')).toHaveCount(5);
   });
 
@@ -505,7 +495,6 @@ test.describe('Weather dashboard', () => {
     await expect(page.locator('.sidebar [role="alert"]')).toContainText(
       'Weather service unavailable.',
     );
-    await expect(page.locator('.weather-panel .status-message')).toHaveCount(0);
   });
 
   test('shows error in sidebar when city search API returns a server error', async ({ page }) => {
@@ -545,7 +534,6 @@ test.describe('Weather dashboard', () => {
     await expect(page.locator('.sidebar [role="alert"]')).toContainText(
       'City search service unavailable.',
     );
-    await expect(page.locator('.weather-panel .status-message')).toHaveCount(0);
     await expect(page.locator('.current-city')).toHaveText('Las Vegas');
     await expect(page.locator('.forecast-card')).toHaveCount(5);
   });

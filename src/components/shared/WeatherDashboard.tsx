@@ -11,7 +11,6 @@ import { ForecastGrid } from '../weather/ForecastGrid';
 import { CurrentWeatherPanel } from '../weather/CurrentWeatherPanel';
 import { WeatherPanelSkeleton } from '../weather/WeatherPanelSkeleton';
 import { SidebarDisclaimer, PanelDisclaimer } from './Disclaimer';
-import { StatusState } from './StatusState';
 
 type WeatherDashboardProps = {
   defaultUnit: TemperatureUnit;
@@ -36,17 +35,18 @@ export const WeatherDashboard = ({ defaultUnit }: WeatherDashboardProps) => {
           }}
           disabled={vm.controlsDisabled}
         />
-        <StatusState
-          message={vm.searchStatusText ?? vm.weatherStatusText}
-          isError={vm.searchStatusIsError || vm.weatherStatusIsError}
-          className="sidebar-status-message"
-        />
-        <CityCandidatesList
-          cities={app.candidateCities}
-          onSelect={(city) => {
-            void app.selectCity(city);
-          }}
-        />
+        {vm.activeErrorMessage ? (
+          <p role="alert" className="provider-error">
+            {vm.activeErrorMessage}
+          </p>
+        ) : (
+          <CityCandidatesList
+            cities={app.candidateCities}
+            onSelect={(city) => {
+              void app.selectCity(city);
+            }}
+          />
+        )}
         <SidebarDisclaimer />
       </aside>
 
