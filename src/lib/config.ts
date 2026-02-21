@@ -17,6 +17,7 @@ export const appConfig = {
   rateLimitWindowMs: toInteger(process.env.RATE_LIMIT_WINDOW_MS, 60_000),
   rateLimitMaxRequests: toInteger(process.env.RATE_LIMIT_MAX_REQUESTS, 60),
   cacheTtlSeconds: toInteger(process.env.CACHE_TTL_SECONDS, 300),
+  openWeatherApiKey: process.env.OPENWEATHER_API_KEY ?? '',
 };
 
 export const clientConfig = {
