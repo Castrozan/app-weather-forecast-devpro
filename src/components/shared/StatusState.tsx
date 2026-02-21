@@ -9,8 +9,16 @@ export const StatusState = ({ message, isError = false, className }: StatusState
     return null;
   }
 
+  if (isError) {
+    return (
+      <p role="alert" className={`status-message status-message-error ${className ?? ''}`}>
+        {message}
+      </p>
+    );
+  }
+
   return (
-    <p className={`status-message ${isError ? 'status-message-error' : ''} ${className ?? ''}`}>
+    <p aria-live="polite" className={`status-message ${className ?? ''}`}>
       {message}
     </p>
   );
