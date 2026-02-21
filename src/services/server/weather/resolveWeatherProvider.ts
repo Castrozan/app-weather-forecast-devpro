@@ -15,7 +15,7 @@ const buildWeatherProvider = (): WeatherProviderPort => {
   }
 
   const openWeatherProvider = createOpenWeatherWeatherProvider(openWeatherApiKey);
-  return createProviderWithFallback(openMeteoProvider, openWeatherProvider);
+  return createProviderWithFallback(openWeatherProvider, openMeteoProvider);
 };
 
 export const getWeatherProvider = (): WeatherProviderPort => {
