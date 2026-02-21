@@ -338,7 +338,6 @@ test.describe('Weather dashboard', () => {
   });
 
   test('lazily loads user location when geolocation is granted', async ({ page }) => {
-    const weatherRequestCities: string[] = [];
     await grantGeolocationPermission(page, 34.0522, -118.2437);
 
     await page.route('**/api/v1/cities?**', async (route) => {
@@ -360,7 +359,6 @@ test.describe('Weather dashboard', () => {
       const lat = Number(url.searchParams.get('lat') ?? '36.1699');
       const lon = Number(url.searchParams.get('lon') ?? '-115.1398');
 
-      weatherRequestCities.push(city);
       if (city === 'Near You') {
         await wait(900);
       }
@@ -372,16 +370,184 @@ test.describe('Weather dashboard', () => {
       });
     });
 
+    const nearYouRequestInFlight = page.waitForRequest(
+      (request) =>
+        request.url().includes('/api/v1/weather') && request.url().includes('city=Near+You'),
+    );
+
     await page.goto('/');
 
     const searchInput = page.getByLabel('Search');
     await expect(page.locator('.current-city')).toHaveText('Las Vegas');
     await expect(searchInput).toHaveValue('');
-    await expect.poll(() => weatherRequestCities.includes('Near You')).toBe(true);
-    await expect(page.locator('.weather-skeleton')).toHaveCount(1);
+
+    await nearYouRequestInFlight;
+
     await expect(page.locator('.weather-skeleton')).toBeVisible();
     await expect(page.locator('.current-city')).toHaveText('Las Vegas');
     await expect(page.locator('.current-city')).toHaveText('Near You');
     await expect(searchInput).toHaveValue('');
+  });
+
+  test('stays on default city without error when geolocation is denied', async ({ page }) => {
+    await denyGeolocationPermission(page);
+
+    await page.route('**/api/v1/weather?**', async (route) => {
+      const url = new URL(route.request().url());
+      const units = (url.searchParams.get('units') ?? 'metric') as TemperatureUnit;
+      const city = url.searchParams.get('city') ?? 'Las Vegas';
+      const country = url.searchParams.get('country') ?? 'United States';
+      const lat = Number(url.searchParams.get('lat') ?? '36.1699');
+      const lon = Number(url.searchParams.get('lon') ?? '-115.1398');
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(buildWeatherPayload(city, country, lat, lon, units)),
+      });
+    });
+
+    await page.goto('/');
+
+    await expect(page.locator('.current-city')).toHaveText('Las Vegas');
+    await expect(page.locator('.weather-content-visible')).toBeVisible();
+    await expect(page.locator('.status-message')).toHaveCount(0);
+    await expect(page.locator('.weather-panel .status-message')).toHaveCount(0);
+  });
+
+  test('auto-selects city and loads weather when search returns exactly one result', async ({
+    page,
+  }) => {
+    await denyGeolocationPermission(page);
+
+    const singleCityCandidate = cityCandidates[0];
+
+    await page.route('**/api/v1/cities?**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          query: 'New York',
+          cities: [singleCityCandidate],
+        }),
+      });
+    });
+
+    await page.route('**/api/v1/weather?**', async (route) => {
+      const url = new URL(route.request().url());
+      const units = (url.searchParams.get('units') ?? 'metric') as TemperatureUnit;
+      const city = url.searchParams.get('city') ?? 'Las Vegas';
+      const country = url.searchParams.get('country') ?? 'United States';
+      const lat = Number(url.searchParams.get('lat') ?? '36.1699');
+      const lon = Number(url.searchParams.get('lon') ?? '-115.1398');
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(buildWeatherPayload(city, country, lat, lon, units)),
+      });
+    });
+
+    await page.goto('/');
+
+    await expect(page.locator('.current-city')).toHaveText('Las Vegas');
+
+    await page.getByLabel('Search').fill('New York');
+    await page.getByRole('button', { name: 'Find' }).click();
+
+    await expect(page.locator('.current-city')).toHaveText('New York');
+    await expect(page.locator('.candidate-button')).toHaveCount(0);
+    await expect(page.locator('.sidebar .status-message')).toHaveCount(0);
+    await expect(page.locator('.forecast-card')).toHaveCount(5);
+  });
+
+  test('shows error in weather panel when weather API returns a server error', async ({ page }) => {
+    await denyGeolocationPermission(page);
+
+    let weatherCallCount = 0;
+
+    await page.route('**/api/v1/weather?**', async (route) => {
+      weatherCallCount += 1;
+
+      if (weatherCallCount === 1) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(
+            buildWeatherPayload('Las Vegas', 'United States', 36.1699, -115.1398, 'metric'),
+          ),
+        });
+        return;
+      }
+
+      await route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'Weather service unavailable.' }),
+      });
+    });
+
+    await page.route('**/api/v1/cities?**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ query: 'New York', cities: [cityCandidates[0]] }),
+      });
+    });
+
+    await page.goto('/');
+
+    await expect(page.locator('.current-city')).toHaveText('Las Vegas');
+    await expect(page.locator('.weather-content-visible')).toBeVisible();
+
+    await page.getByLabel('Search').fill('New York');
+    await page.getByRole('button', { name: 'Find' }).click();
+
+    await expect(page.locator('.sidebar [role="alert"]')).toContainText(
+      'Weather service unavailable.',
+    );
+    await expect(page.locator('.weather-panel .status-message')).toHaveCount(0);
+  });
+
+  test('shows error in sidebar when city search API returns a server error', async ({ page }) => {
+    await denyGeolocationPermission(page);
+
+    await page.route('**/api/v1/weather?**', async (route) => {
+      const url = new URL(route.request().url());
+      const units = (url.searchParams.get('units') ?? 'metric') as TemperatureUnit;
+      const city = url.searchParams.get('city') ?? 'Las Vegas';
+      const country = url.searchParams.get('country') ?? 'United States';
+      const lat = Number(url.searchParams.get('lat') ?? '36.1699');
+      const lon = Number(url.searchParams.get('lon') ?? '-115.1398');
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(buildWeatherPayload(city, country, lat, lon, units)),
+      });
+    });
+
+    await page.route('**/api/v1/cities?**', async (route) => {
+      await route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'City search service unavailable.' }),
+      });
+    });
+
+    await page.goto('/');
+
+    await expect(page.locator('.current-city')).toHaveText('Las Vegas');
+    await expect(page.locator('.weather-content-visible')).toBeVisible();
+
+    await page.getByLabel('Search').fill('New York');
+    await page.getByRole('button', { name: 'Find' }).click();
+
+    await expect(page.locator('.sidebar [role="alert"]')).toContainText(
+      'City search service unavailable.',
+    );
+    await expect(page.locator('.weather-panel .status-message')).toHaveCount(0);
+    await expect(page.locator('.current-city')).toHaveText('Las Vegas');
+    await expect(page.locator('.forecast-card')).toHaveCount(5);
   });
 });

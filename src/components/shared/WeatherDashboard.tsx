@@ -44,8 +44,8 @@ export const WeatherDashboard = ({ defaultUnit }: WeatherDashboardProps) => {
           disabled={vm.controlsDisabled}
         />
         <StatusState
-          message={vm.searchStatusText}
-          isError={vm.searchStatusIsError}
+          message={vm.searchStatusText ?? vm.weatherStatusText}
+          isError={vm.searchStatusIsError || vm.weatherStatusIsError}
           className="sidebar-status-message"
         />
         <CityCandidatesList
@@ -61,7 +61,6 @@ export const WeatherDashboard = ({ defaultUnit }: WeatherDashboardProps) => {
           <h2 className="panel-title">Weather</h2>
           <p className="panel-subtitle">Current conditions and daily outlook</p>
         </header>
-        <StatusState message={vm.weatherStatusText} isError={vm.weatherStatusIsError} />
         <div className="weather-stage">
           {vm.weatherData ? (
             <div
