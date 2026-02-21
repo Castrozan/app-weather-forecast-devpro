@@ -15,7 +15,6 @@ export const ForecastGrid = ({ weather }: ForecastGridProps) => {
     <section className="forecast-section" aria-label="5-day forecast">
       <div className="forecast-header">
         <h3 className="forecast-title">5-Day Forecast</h3>
-        <p className="forecast-subtitle">Daily min and max temperature</p>
       </div>
       <div className="forecast-grid">
         {weather.forecastDaily.map((forecast) => (
