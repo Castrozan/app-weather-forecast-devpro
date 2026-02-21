@@ -1,7 +1,12 @@
 'use client';
 
 import { useWeatherApp } from '@/hooks/useWeatherApp';
-import { isSearchStatusMessage, isTransientStatusMessage } from '@/lib/statusMessage';
+import {
+  isErrorStatusMessage,
+  isSearchStatusMessage,
+  isTransientStatusMessage,
+} from '@/lib/statusMessage';
+import type { TemperatureUnit } from '@/types/weather';
 
 import { CityCandidatesList } from '../search/CityCandidatesList';
 import { SearchForm } from '../search/SearchForm';
@@ -13,7 +18,9 @@ import { Disclaimer } from './Disclaimer';
 import { StatusState } from './StatusState';
 
 export const WeatherDashboard = () => {
-  const app = useWeatherApp();
+  const defaultUnit =
+    (process.env.NEXT_PUBLIC_DEFAULT_TEMPERATURE_UNIT as TemperatureUnit | undefined) ?? 'metric';
+  const app = useWeatherApp(defaultUnit);
   const searchStatusMessage =
     app.statusMessage !== null && isSearchStatusMessage(app.statusMessage)
       ? app.statusMessage
@@ -23,7 +30,7 @@ export const WeatherDashboard = () => {
       ? app.statusMessage
       : null;
   const hasTransientStatus =
-    weatherStatusMessage !== null && isTransientStatusMessage(weatherStatusMessage);
+    app.statusMessage !== null && isTransientStatusMessage(app.statusMessage);
   const shouldShowSkeleton =
     app.isLoadingWeather ||
     (!app.weather && (app.isSearching || hasTransientStatus || !weatherStatusMessage));
@@ -55,7 +62,11 @@ export const WeatherDashboard = () => {
           }}
           disabled={app.isSearching || app.isLoadingWeather}
         />
-        <StatusState message={searchStatusMessage} className="sidebar-status-message" />
+        <StatusState
+          message={searchStatusMessage?.text ?? null}
+          isError={searchStatusMessage ? isErrorStatusMessage(searchStatusMessage) : false}
+          className="sidebar-status-message"
+        />
         <CityCandidatesList
           cities={app.candidateCities}
           onSelect={(city) => {
@@ -69,7 +80,10 @@ export const WeatherDashboard = () => {
           <h2 className="panel-title">Weather</h2>
           <p className="panel-subtitle">Current conditions and daily outlook</p>
         </header>
-        <StatusState message={weatherStatusMessage} />
+        <StatusState
+          message={weatherStatusMessage?.text ?? null}
+          isError={weatherStatusMessage ? isErrorStatusMessage(weatherStatusMessage) : false}
+        />
         <div className="weather-stage">
           {weatherData ? (
             <div

@@ -1,20 +1,27 @@
-const TRANSIENT_STATUS_PATTERN =
-  /loading weather|loading local weather|searching cities|enter a city name to search|search for a city/i;
+export type StatusMessageKind =
+  | 'search-loading'
+  | 'search-info'
+  | 'search-error'
+  | 'weather-loading'
+  | 'weather-error';
 
-const SEARCH_STATUS_PATTERN =
-  /searching cities|enter a city name to search|multiple matches found|no city found|city search/i;
-
-const ERROR_STATUS_PATTERN =
-  /unable|failed|unauthorized|not configured|temporarily unavailable|too many|invalid|required|no city/i;
-
-export const isTransientStatusMessage = (message: string): boolean => {
-  return TRANSIENT_STATUS_PATTERN.test(message);
+export type StatusMessage = {
+  kind: StatusMessageKind;
+  text: string;
 };
 
-export const isErrorStatusMessage = (message: string): boolean => {
-  return ERROR_STATUS_PATTERN.test(message);
+export const isSearchStatusMessage = (message: StatusMessage): boolean => {
+  return (
+    message.kind === 'search-loading' ||
+    message.kind === 'search-info' ||
+    message.kind === 'search-error'
+  );
 };
 
-export const isSearchStatusMessage = (message: string): boolean => {
-  return SEARCH_STATUS_PATTERN.test(message);
+export const isTransientStatusMessage = (message: StatusMessage): boolean => {
+  return message.kind === 'search-loading' || message.kind === 'weather-loading';
+};
+
+export const isErrorStatusMessage = (message: StatusMessage): boolean => {
+  return message.kind === 'search-error' || message.kind === 'weather-error';
 };

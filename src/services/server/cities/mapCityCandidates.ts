@@ -28,7 +28,3 @@ export const mapCityCandidates = (entries: WeatherProviderCity[]): CityCandidate
 
   return [...deduplicated.values()];
 };
-
-export const shouldAutoSelectCity = (cities: CityCandidate[]): CityCandidate | null => {
-  return cities.length === 1 ? cities[0] : null;
-};

@@ -1,16 +1,13 @@
-import { isErrorStatusMessage, isTransientStatusMessage } from '@/lib/statusMessage';
-
 type StatusStateProps = {
   message: string | null;
+  isError?: boolean;
   className?: string;
 };
 
-export const StatusState = ({ message, className }: StatusStateProps) => {
-  if (!message || isTransientStatusMessage(message)) {
+export const StatusState = ({ message, isError = false, className }: StatusStateProps) => {
+  if (!message) {
     return null;
   }
-
-  const isError = isErrorStatusMessage(message);
 
   return (
     <p className={`status-message ${isError ? 'status-message-error' : ''} ${className ?? ''}`}>

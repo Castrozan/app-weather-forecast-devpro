@@ -10,6 +10,10 @@ const unitSymbol = (units: WeatherResponse['units']): string => {
   return units === 'metric' ? 'C' : 'F';
 };
 
+const windSpeedUnit = (units: WeatherResponse['units']): string => {
+  return units === 'metric' ? 'km/h' : 'mph';
+};
+
 export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
   return (
     <section className="current-weather" aria-label="Current weather">
@@ -53,7 +57,9 @@ export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
         </div>
         <div className="current-stat">
           <dt>Wind</dt>
-          <dd>{weather.current.windSpeed}</dd>
+          <dd>
+            {weather.current.windSpeed} {windSpeedUnit(weather.units)}
+          </dd>
         </div>
       </dl>
     </section>

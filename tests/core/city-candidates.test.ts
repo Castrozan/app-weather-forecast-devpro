@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  mapCityCandidates,
-  shouldAutoSelectCity,
-} from '@/services/server/cities/mapCityCandidates';
+import { mapCityCandidates } from '@/services/server/cities/mapCityCandidates';
 import type { WeatherProviderCity } from '@/services/server/weather/ports/weatherProvider';
 
 describe('mapCityCandidates', () => {
@@ -37,8 +34,8 @@ describe('mapCityCandidates', () => {
     });
   });
 
-  it('auto-selects only when there is a single option', () => {
-    const one = mapCityCandidates([
+  it('returns a single candidate when only one result matches', () => {
+    const result = mapCityCandidates([
       {
         name: 'Chicago',
         country: 'US',
@@ -47,22 +44,19 @@ describe('mapCityCandidates', () => {
       },
     ]);
 
-    const many = mapCityCandidates([
-      {
-        name: 'London',
-        country: 'GB',
-        lat: 51.5073219,
-        lon: -0.1276474,
-      },
-      {
-        name: 'London',
-        country: 'CA',
-        lat: 42.9832406,
-        lon: -81.243372,
-      },
-    ]);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({ displayName: 'Chicago, US' });
+  });
 
-    expect(shouldAutoSelectCity(one)?.displayName).toBe('Chicago, US');
-    expect(shouldAutoSelectCity(many)).toBeNull();
+  it('deduplicates entries with identical lat/lon coordinates', () => {
+    const input: WeatherProviderCity[] = [
+      { name: 'London', country: 'GB', lat: 51.5073219, lon: -0.1276474 },
+      { name: 'London', country: 'CA', lat: 42.9832406, lon: -81.243372 },
+    ];
+
+    const result = mapCityCandidates(input);
+
+    expect(result).toHaveLength(2);
+    expect(result.map((c) => c.country)).toEqual(['GB', 'CA']);
   });
 });

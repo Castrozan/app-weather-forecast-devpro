@@ -16,6 +16,11 @@ const getClientKey = (request: NextRequest): string => {
     return forwarded.split(',')[0]?.trim() ?? 'unknown';
   }
 
+  const realIp = request.headers.get('x-real-ip');
+  if (realIp) {
+    return realIp.trim();
+  }
+
   return 'unknown';
 };
 

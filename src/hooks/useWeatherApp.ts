@@ -5,6 +5,7 @@ import { useMutation } from '@tanstack/react-query';
 
 import { DEFAULT_CITY } from '@/lib/defaultCity';
 import { withMinimumDuration } from '@/lib/minimumDuration';
+import type { StatusMessage } from '@/lib/statusMessage';
 import { requestUserCoordinates } from '@/services/client/location/requestUserCoordinates';
 import { weatherApiClient } from '@/services/client/weatherApiClient';
 import type { CityCandidate, TemperatureUnit, WeatherResponse } from '@/types/weather';
@@ -15,7 +16,7 @@ export type WeatherAppState = {
   candidateCities: CityCandidate[];
   units: TemperatureUnit;
   weather: WeatherResponse | null;
-  statusMessage: string | null;
+  statusMessage: StatusMessage | null;
   isSearching: boolean;
   isLoadingWeather: boolean;
   setCityQuery: (value: string) => void;
@@ -30,7 +31,7 @@ const LAZY_GEOLOCATION_DELAY_MS = 1_600;
 const MIN_WEATHER_LOADING_DURATION_MS = 500;
 
 type LoadWeatherOptions = {
-  loadingMessage?: string;
+  loadingMessage?: StatusMessage;
   preserveWeatherOnError?: boolean;
   suppressErrorStatus?: boolean;
 };
@@ -52,11 +53,12 @@ export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherA
   const [selectedCity, setSelectedCity] = useState<CityCandidate | null>(null);
   const [candidateCities, setCandidateCities] = useState<CityCandidate[]>([]);
   const [weather, setWeather] = useState<WeatherResponse | null>(null);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<StatusMessage | null>(null);
   const hasInitializedRef = useRef(false);
   const hasLoadedDefaultWeatherRef = useRef(false);
   const hasAttemptedGeolocationRef = useRef(false);
   const hasUserInteractionRef = useRef(false);
+  const currentUnitsRef = useRef(units);
 
   const setCityQuery = useCallback((value: string): void => {
     hasUserInteractionRef.current = true;
@@ -93,7 +95,9 @@ export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherA
       nextUnits: TemperatureUnit,
       options: LoadWeatherOptions = {},
     ): Promise<void> => {
-      setStatusMessage(options.loadingMessage ?? 'Loading weather...');
+      setStatusMessage(
+        options.loadingMessage ?? { kind: 'weather-loading', text: 'Loading weather...' },
+      );
 
       try {
         const weatherData = await weatherMutation.mutateAsync({
@@ -111,38 +115,44 @@ export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherA
         }
 
         if (!options.suppressErrorStatus) {
-          setStatusMessage(error instanceof Error ? error.message : 'Failed to load weather data.');
+          setStatusMessage({
+            kind: 'weather-error',
+            text: error instanceof Error ? error.message : 'Failed to load weather data.',
+          });
         }
       }
     },
     [weatherMutation],
   );
 
-  const selectCity = async (city: CityCandidate): Promise<void> => {
-    hasUserInteractionRef.current = true;
-    setSelectedCity(city);
-    setCandidateCities([]);
-    setCityQueryState(city.name);
-    await loadWeatherForCity(city, units);
-  };
+  const selectCity = useCallback(
+    async (city: CityCandidate): Promise<void> => {
+      hasUserInteractionRef.current = true;
+      setSelectedCity(city);
+      setCandidateCities([]);
+      setCityQueryState(city.name);
+      await loadWeatherForCity(city, units);
+    },
+    [loadWeatherForCity, units],
+  );
 
-  const search = async (): Promise<void> => {
+  const search = useCallback(async (): Promise<void> => {
     hasUserInteractionRef.current = true;
     const query = cityQueryState.trim();
 
     if (!query) {
-      setStatusMessage('Enter a city name to search.');
+      setStatusMessage({ kind: 'search-info', text: 'Enter a city name to search.' });
       return;
     }
 
-    setStatusMessage('Searching cities...');
+    setStatusMessage({ kind: 'search-loading', text: 'Searching cities...' });
 
     try {
       const cities = await searchMutation.mutateAsync(query);
 
       if (cities.length === 0) {
         setCandidateCities([]);
-        setStatusMessage('No city found for this query.');
+        setStatusMessage({ kind: 'search-error', text: 'No city found for this query.' });
         return;
       }
 
@@ -152,15 +162,22 @@ export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherA
       }
 
       setCandidateCities(cities);
-      setStatusMessage('Multiple matches found. Select the correct city.');
+      setStatusMessage({
+        kind: 'search-info',
+        text: 'Multiple matches found. Select the correct city.',
+      });
     } catch (error) {
       setCandidateCities([]);
-      setStatusMessage(error instanceof Error ? error.message : 'Failed to search cities.');
+      setStatusMessage({
+        kind: 'search-error',
+        text: error instanceof Error ? error.message : 'Failed to search cities.',
+      });
     }
-  };
+  }, [cityQueryState, searchMutation, selectCity]);
 
   const setUnits = async (nextUnit: TemperatureUnit): Promise<void> => {
     hasUserInteractionRef.current = true;
+    currentUnitsRef.current = nextUnit;
     setUnitsState(nextUnit);
 
     if (!selectedCity) {
@@ -181,7 +198,7 @@ export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherA
         setCandidateCities([]);
 
         try {
-          await loadWeatherForCity(DEFAULT_CITY, units);
+          await loadWeatherForCity(DEFAULT_CITY, currentUnitsRef.current);
         } finally {
           hasLoadedDefaultWeatherRef.current = true;
         }
@@ -208,8 +225,8 @@ export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherA
           const localCity = toLocalCityCandidate(coordinates.lat, coordinates.lon);
           setSelectedCity(localCity);
           setCandidateCities([]);
-          await loadWeatherForCity(localCity, units, {
-            loadingMessage: 'Loading local weather...',
+          await loadWeatherForCity(localCity, currentUnitsRef.current, {
+            loadingMessage: { kind: 'weather-loading', text: 'Loading local weather...' },
             preserveWeatherOnError: true,
             suppressErrorStatus: true,
           });
@@ -226,7 +243,7 @@ export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherA
         window.clearTimeout(geolocationTimerId);
       }
     };
-  }, [loadWeatherForCity, units]);
+  }, [loadWeatherForCity]);
 
   return {
     cityQuery: cityQueryState,

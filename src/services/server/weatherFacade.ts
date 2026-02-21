@@ -5,7 +5,7 @@ import { aggregateForecastByDay } from '@/services/server/forecast/aggregateFore
 import type { WeatherLocationHint } from '@/services/server/weather/ports/weatherProvider';
 import { getWeatherProvider } from '@/services/server/weather/resolveWeatherProvider';
 
-const weekdayFormatter = new Intl.DateTimeFormat(undefined, {
+const weekdayFormatter = new Intl.DateTimeFormat('en-US', {
   weekday: 'long',
   timeZone: 'UTC',
 });
@@ -17,16 +17,33 @@ const mapDateToLabel = (date: string): string => {
 
 const weatherCache = createInMemoryTtlCache<WeatherResponse>();
 
-const weatherCacheKey = (
-  lat: number,
-  lon: number,
-  units: TemperatureUnit,
-  locationHint?: WeatherLocationHint,
-): string => {
-  const normalizedName = locationHint?.name?.trim().toLowerCase() ?? '';
-  const normalizedCountry = locationHint?.country?.trim().toLowerCase() ?? '';
+const weatherCacheKey = (lat: number, lon: number, units: TemperatureUnit): string => {
+  return `${lat}:${lon}:${units}`;
+};
 
-  return `${lat}:${lon}:${units}:${normalizedName}:${normalizedCountry}`;
+const applyLocationHintToResponse = (
+  response: WeatherResponse,
+  locationHint: WeatherLocationHint | undefined,
+): WeatherResponse => {
+  if (!locationHint) {
+    return response;
+  }
+
+  const hintedName = locationHint.name?.trim() || response.location.name;
+  const hintedCountry = locationHint.country?.trim() || response.location.country;
+
+  if (hintedName === response.location.name && hintedCountry === response.location.country) {
+    return response;
+  }
+
+  return {
+    ...response,
+    location: {
+      ...response.location,
+      name: hintedName,
+      country: hintedCountry,
+    },
+  };
 };
 
 export const clearWeatherCache = (): void => {
@@ -40,12 +57,12 @@ export const getWeatherByCoordinates = async (
   locationHint?: WeatherLocationHint,
 ): Promise<WeatherResponse> => {
   const cacheTtlSeconds = appConfig.cacheTtlSeconds;
-  const key = weatherCacheKey(lat, lon, units, locationHint);
+  const key = weatherCacheKey(lat, lon, units);
 
   if (cacheTtlSeconds > 0) {
     const cached = weatherCache.get(key);
     if (cached) {
-      return cached;
+      return applyLocationHintToResponse(cached, locationHint);
     }
   }
 
@@ -54,7 +71,6 @@ export const getWeatherByCoordinates = async (
     lat,
     lon,
     units,
-    locationHint,
   });
 
   const daily = aggregateForecastByDay(
@@ -89,5 +105,5 @@ export const getWeatherByCoordinates = async (
     weatherCache.set(key, response, cacheTtlSeconds);
   }
 
-  return response;
+  return applyLocationHintToResponse(response, locationHint);
 };
