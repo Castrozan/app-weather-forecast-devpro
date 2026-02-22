@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 import { withMinimumDuration } from '@/lib/minimumDuration';
 import { weatherApiClient } from '@/services/client/weatherApiClient';
@@ -70,7 +71,10 @@ export const useWeatherLoader = (defaultUnit: TemperatureUnit): WeatherLoaderSta
         setWeather(weatherData);
         setWeatherError(null);
       } catch (error) {
-        setWeatherError(error instanceof Error ? error.message : 'Failed to load weather data.');
+        const weatherErrorMessage =
+          error instanceof Error ? error.message : 'Failed to load weather data.';
+        setWeatherError(weatherErrorMessage);
+        toast.error(weatherErrorMessage);
         if (!options.preserveWeatherOnError) {
           setWeather(null);
         }

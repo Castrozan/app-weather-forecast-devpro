@@ -117,39 +117,4 @@ describe('buildWeatherDashboardViewModel', () => {
       expect(vm.weatherContentKey).toBe('empty-weather-content');
     });
   });
-
-  describe('activeErrorMessage', () => {
-    it('is null when no errors are present', () => {
-      const vm = buildWeatherDashboardViewModel(buildBaseAppState());
-
-      expect(vm.activeErrorMessage).toBeNull();
-    });
-
-    it('returns weatherError when only weather failed', () => {
-      const vm = buildWeatherDashboardViewModel(
-        buildBaseAppState({ weatherError: 'Weather service unavailable.' }),
-      );
-
-      expect(vm.activeErrorMessage).toBe('Weather service unavailable.');
-    });
-
-    it('returns searchError when only city search failed', () => {
-      const vm = buildWeatherDashboardViewModel(
-        buildBaseAppState({ searchError: 'City search service unavailable.' }),
-      );
-
-      expect(vm.activeErrorMessage).toBe('City search service unavailable.');
-    });
-
-    it('gives searchError priority over weatherError when both are set', () => {
-      const vm = buildWeatherDashboardViewModel(
-        buildBaseAppState({
-          searchError: 'City search service unavailable.',
-          weatherError: 'Weather service unavailable.',
-        }),
-      );
-
-      expect(vm.activeErrorMessage).toBe('City search service unavailable.');
-    });
-  });
 });

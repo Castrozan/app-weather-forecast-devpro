@@ -1,5 +1,7 @@
 'use client';
 
+import { Search } from 'lucide-react';
+
 type SearchFormProps = {
   value: string;
   onChange: (value: string) => void;
@@ -29,6 +31,7 @@ export const SearchForm = ({ value, onChange, onSubmit, disabled }: SearchFormPr
         className="search-input"
       />
       <button type="submit" className="button" disabled={disabled}>
+        <Search size={16} aria-hidden="true" />
         Find
       </button>
     </form>

@@ -217,7 +217,7 @@ test.describe('Weather dashboard', () => {
 
     await expect(page.locator('.weather-skeleton')).toBeVisible();
     await expect(page.locator('.current-city')).toHaveText('Las Vegas');
-    await expect(page.locator('.weather-content-visible')).toBeVisible();
+    await expect(page.locator('.weather-content')).toBeVisible();
     await expect(page.locator('.weather-skeleton')).toHaveCount(0);
   });
 
@@ -279,12 +279,16 @@ test.describe('Weather dashboard', () => {
 
     await page.locator('.candidate-button').first().click();
 
+    await expect(page.getByRole('heading', { name: 'New York' })).toBeVisible();
+    await expect(page.locator('.current-city')).toHaveCount(1);
     await expect(page.locator('.current-city')).toHaveText('New York');
     await expect(page.locator('.current-temp')).toContainText('22°C');
     await expect(page.locator('.forecast-card')).toHaveCount(5);
 
     await page.getByRole('button', { name: 'Switch to °F' }).click();
 
+    await expect(page.getByText('72°F')).toBeVisible();
+    await expect(page.locator('.current-temp')).toHaveCount(1);
     await expect(page.locator('.current-temp')).toContainText('72°F');
     await expect.poll(() => weatherRequests).toBe(3);
   });
@@ -385,7 +389,7 @@ test.describe('Weather dashboard', () => {
     await page.goto('/');
 
     await expect(page.locator('.current-city')).toHaveText('Las Vegas');
-    await expect(page.locator('.weather-content-visible')).toBeVisible();
+    await expect(page.locator('.weather-content')).toBeVisible();
   });
 
   test('auto-selects city and loads weather when search returns exactly one result', async ({
@@ -428,12 +432,14 @@ test.describe('Weather dashboard', () => {
     await page.getByLabel('Search').fill('New York');
     await page.getByRole('button', { name: 'Find' }).click();
 
+    await expect(page.getByRole('heading', { name: 'New York' })).toBeVisible();
+    await expect(page.locator('.current-city')).toHaveCount(1);
     await expect(page.locator('.current-city')).toHaveText('New York');
     await expect(page.locator('.candidate-button')).toHaveCount(0);
     await expect(page.locator('.forecast-card')).toHaveCount(5);
   });
 
-  test('shows error in weather panel when weather API returns a server error', async ({ page }) => {
+  test('shows error toast when weather API returns a server error', async ({ page }) => {
     await denyGeolocationPermission(page);
 
     let weatherCallCount = 0;
@@ -470,17 +476,17 @@ test.describe('Weather dashboard', () => {
     await page.goto('/');
 
     await expect(page.locator('.current-city')).toHaveText('Las Vegas');
-    await expect(page.locator('.weather-content-visible')).toBeVisible();
+    await expect(page.locator('.weather-content')).toBeVisible();
 
     await page.getByLabel('Search').fill('New York');
     await page.getByRole('button', { name: 'Find' }).click();
 
-    await expect(page.locator('.sidebar [role="alert"]')).toContainText(
+    await expect(page.locator('[data-sonner-toast][data-type="error"]')).toContainText(
       'Weather service unavailable.',
     );
   });
 
-  test('shows error in sidebar when city search API returns a server error', async ({ page }) => {
+  test('shows error toast when city search API returns a server error', async ({ page }) => {
     await denyGeolocationPermission(page);
 
     await page.route('**/api/v1/weather?**', async (route) => {
@@ -509,12 +515,12 @@ test.describe('Weather dashboard', () => {
     await page.goto('/');
 
     await expect(page.locator('.current-city')).toHaveText('Las Vegas');
-    await expect(page.locator('.weather-content-visible')).toBeVisible();
+    await expect(page.locator('.weather-content')).toBeVisible();
 
     await page.getByLabel('Search').fill('New York');
     await page.getByRole('button', { name: 'Find' }).click();
 
-    await expect(page.locator('.sidebar [role="alert"]')).toContainText(
+    await expect(page.locator('[data-sonner-toast][data-type="error"]')).toContainText(
       'City search service unavailable.',
     );
     await expect(page.locator('.current-city')).toHaveText('Las Vegas');

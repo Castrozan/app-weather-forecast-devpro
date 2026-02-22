@@ -155,6 +155,10 @@ button {
 }
 
 .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   border: 1px solid rgba(170, 225, 255, 0.5);
   border-radius: 12px;
   padding: 10px 14px;
@@ -290,6 +294,9 @@ button {
 }
 
 .candidate-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-weight: 600;
 }
 
@@ -351,19 +358,9 @@ button {
   z-index: 2;
   display: grid;
   gap: 12px;
-  will-change: opacity, transform, filter;
-  transition:
-    opacity 380ms cubic-bezier(0.22, 1, 0.36, 1),
-    filter 320ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.weather-content-visible {
-  animation: weather-content-enter 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .weather-content-loading {
-  animation: none;
   opacity: 0;
   pointer-events: none;
   filter: saturate(0.86) blur(2px);
@@ -373,7 +370,6 @@ button {
 .weather-skeleton-layer {
   position: relative;
   z-index: 3;
-  animation: skeleton-layer-enter 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .weather-skeleton-overlay {
@@ -381,10 +377,6 @@ button {
   inset: 0;
   pointer-events: none;
   background: transparent;
-}
-
-.weather-skeleton-overlay .weather-skeleton {
-  animation: skeleton-overlay-enter 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .weather-skeleton {
@@ -609,6 +601,9 @@ button {
 }
 
 .current-stat dt {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.09em;
@@ -735,6 +730,29 @@ button {
   padding-top: 12px;
 }
 
+.error-fallback {
+  grid-column: 1 / -1;
+  display: grid;
+  place-content: center;
+  gap: 16px;
+  padding: 48px 32px;
+  text-align: center;
+}
+
+.error-fallback-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.error-fallback-message {
+  margin: 0;
+  color: rgba(255, 200, 200, 0.92);
+  font-size: 15px;
+  line-height: 1.5;
+  max-width: 420px;
+}
+
 .provider-error {
   margin: 0;
   padding: 14px 16px;
@@ -816,48 +834,6 @@ button {
   }
 }
 
-@keyframes weather-content-enter {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.994);
-    filter: blur(2px) saturate(0.92);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0) saturate(1);
-  }
-}
-
-@keyframes skeleton-overlay-enter {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.992);
-    filter: saturate(0.9);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: saturate(1);
-  }
-}
-
-@keyframes skeleton-layer-enter {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-    filter: saturate(0.92);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: saturate(1);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .skeleton-line,
   .weather-skeleton-stat,
@@ -865,18 +841,6 @@ button {
   .weather-skeleton-icon-sm {
     animation: none;
     background: #5f86a8;
-  }
-
-  .weather-content-visible {
-    animation: none;
-  }
-
-  .weather-skeleton-overlay .weather-skeleton {
-    animation: none;
-  }
-
-  .weather-skeleton-layer {
-    animation: none;
   }
 }
 

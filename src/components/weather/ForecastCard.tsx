@@ -1,3 +1,5 @@
+import clsx from 'clsx';
+
 import { temperatureUnitSymbol } from '@/lib/weatherUnits';
 import type { ForecastDay, TemperatureUnit } from '@/types/weather';
 import { resolveWeatherIconClass } from './weatherIconClass';
@@ -12,7 +14,7 @@ export const ForecastCard = ({ forecast, units }: ForecastCardProps) => {
     <article className="forecast-card">
       <h4 className="forecast-label">{forecast.label}</h4>
       <span className="forecast-icon">
-        <i className={`wi ${resolveWeatherIconClass(forecast.icon)}`} aria-hidden="true" />
+        <i className={clsx('wi', resolveWeatherIconClass(forecast.icon))} aria-hidden="true" />
       </span>
       <p className="forecast-description">{forecast.description}</p>
       <div className="forecast-minmax-grid">

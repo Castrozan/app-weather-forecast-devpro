@@ -1,3 +1,6 @@
+import clsx from 'clsx';
+import { Droplets, Thermometer, ThermometerSnowflake, Wind } from 'lucide-react';
+
 import { temperatureUnitSymbol, windSpeedUnitLabel } from '@/lib/weatherUnits';
 import type { WeatherResponse } from '@/types/weather';
 
@@ -22,7 +25,7 @@ export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
         <div className="current-temperature">
           <span className="current-icon">
             <i
-              className={`wi ${resolveWeatherIconClass(weather.current.icon)}`}
+              className={clsx('wi', resolveWeatherIconClass(weather.current.icon))}
               aria-hidden="true"
             />
           </span>
@@ -33,23 +36,35 @@ export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
       </div>
       <dl className="current-stats">
         <div className="current-stat">
-          <dt>Min</dt>
+          <dt>
+            <ThermometerSnowflake size={14} aria-hidden="true" />
+            Min
+          </dt>
           <dd>
             {weather.current.min}°{temperatureUnitSymbol(weather.units)}
           </dd>
         </div>
         <div className="current-stat">
-          <dt>Max</dt>
+          <dt>
+            <Thermometer size={14} aria-hidden="true" />
+            Max
+          </dt>
           <dd>
             {weather.current.max}°{temperatureUnitSymbol(weather.units)}
           </dd>
         </div>
         <div className="current-stat">
-          <dt>Humidity</dt>
+          <dt>
+            <Droplets size={14} aria-hidden="true" />
+            Humidity
+          </dt>
           <dd>{weather.current.humidity}%</dd>
         </div>
         <div className="current-stat">
-          <dt>Wind</dt>
+          <dt>
+            <Wind size={14} aria-hidden="true" />
+            Wind
+          </dt>
           <dd>
             {weather.current.windSpeed} {windSpeedUnitLabel(weather.units)}
           </dd>

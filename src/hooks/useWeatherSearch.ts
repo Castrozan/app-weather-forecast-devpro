@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 import { weatherApiClient } from '@/services/client/weatherApiClient';
 import type { CityCandidate, TemperatureUnit } from '@/types/weather';
@@ -74,7 +75,9 @@ export const useWeatherSearch = (
 
       setCandidateCities(cities);
     } catch (error) {
-      setSearchError(error instanceof Error ? error.message : 'City search failed.');
+      const searchErrorMessage = error instanceof Error ? error.message : 'City search failed.';
+      setSearchError(searchErrorMessage);
+      toast.error(searchErrorMessage);
       setCandidateCities([]);
     }
   }, [cityQueryState, searchMutation, selectCity]);
