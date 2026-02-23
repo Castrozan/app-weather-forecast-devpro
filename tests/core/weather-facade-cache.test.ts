@@ -5,7 +5,7 @@ const mockProvider = vi.hoisted(() => ({
   fetchWeatherByCoordinates: vi.fn(),
 }));
 
-vi.mock('@/services/server/weather/resolveWeatherProvider', () => ({
+vi.mock('@/features/weather/providers/resolveWeatherProvider', () => ({
   getWeatherProvider: () => ({
     name: 'test-provider',
     searchCities: mockProvider.searchCities,
@@ -13,7 +13,7 @@ vi.mock('@/services/server/weather/resolveWeatherProvider', () => ({
   }),
 }));
 
-import { clearWeatherCache, getWeatherByCoordinates } from '@/services/server/weatherFacade';
+import { clearWeatherCache, getWeatherByCoordinates } from '@/features/weather/weatherFacade';
 
 const baseProviderWeather = {
   location: {

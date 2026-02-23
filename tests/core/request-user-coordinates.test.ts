@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { requestUserCoordinates } from '@/services/client/location/requestUserCoordinates';
+import { requestUserCoordinates } from '@/features/geolocation/requestUserCoordinates';
 
 describe('requestUserCoordinates', () => {
   it('returns null when browser geolocation is unavailable', async () => {

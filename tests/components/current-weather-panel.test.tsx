@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { CurrentWeatherPanel } from '@/components/weather/CurrentWeatherPanel';
-import type { WeatherResponse } from '@/types/weather';
+import { CurrentWeatherPanel } from '@/features/weather/components/CurrentWeatherPanel';
+import type { WeatherResponse } from '@/features/weather/types';
 
 const buildMetricWeatherResponse = (): WeatherResponse => ({
   location: { name: 'Tokyo', country: 'JP', lat: 35.68, lon: 139.69 },

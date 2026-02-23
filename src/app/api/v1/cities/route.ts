@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { searchCities } from '@/services/server/cities/searchCities';
-import { handleWeatherProviderError } from '@/services/server/weather/handleWeatherProviderError';
-import { verifyRateLimit, verifySession } from '@/services/server/security/requestSecurity';
+import { mapCityCandidates } from '@/features/search/cities/mapCityCandidates';
+import { handleWeatherProviderError } from '@/features/weather/providers/handleWeatherProviderError';
+import { getWeatherProvider } from '@/features/weather/providers/resolveWeatherProvider';
+import { verifyRateLimit, verifySession } from '@/features/security/requestSecurity';
 
 export const runtime = 'nodejs';
 
@@ -33,7 +34,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 
   try {
-    const cities = await searchCities(query);
+    const rawCities = await getWeatherProvider().searchCities(query, 5);
+    const cities = mapCityCandidates(rawCities);
     return NextResponse.json({ query, cities });
   } catch (error) {
     return handleWeatherProviderError(error, 'Unable to resolve city search at this time.');

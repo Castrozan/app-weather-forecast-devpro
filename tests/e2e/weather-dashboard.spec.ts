@@ -1,6 +1,10 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import type { CityCandidate, TemperatureUnit, WeatherResponse } from '../../src/types/weather';
+import type {
+  CityCandidate,
+  TemperatureUnit,
+  WeatherResponse,
+} from '../../src/features/weather/types';
 
 const cityCandidates: CityCandidate[] = [
   {

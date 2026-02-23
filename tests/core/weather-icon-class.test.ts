@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolveWeatherIconClass } from '@/shared/icons/weatherIconClass';
+import { resolveWeatherIconClass } from '@/features/weather/icons/weatherIconClass';
 
 describe('resolveWeatherIconClass', () => {
   it('maps day and night icon codes to weather-icons classes', () => {

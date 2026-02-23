@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { temperatureUnitSymbol, windSpeedUnitLabel } from '@/lib/weatherUnits';
+import { temperatureUnitSymbol, windSpeedUnitLabel } from '@/features/weather/units';
 
 describe('temperatureUnitSymbol', () => {
   it('returns C for metric', () => {

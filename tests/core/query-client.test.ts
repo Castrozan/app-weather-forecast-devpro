@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createAppQueryClient } from '@/lib/queryClient';
+import { createAppQueryClient } from '@/shared/infrastructure/queryClient';
 
 describe('createAppQueryClient', () => {
   it('creates a QueryClient with retry set to 1', () => {

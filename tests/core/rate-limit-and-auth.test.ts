@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { createInMemoryRateLimiter } from '@/services/server/security/rateLimiter';
-import { isValidAccessToken } from '@/services/server/security/accessToken';
+import { createInMemoryRateLimiter } from '@/features/security/rateLimiter';
+import { isValidAccessToken } from '@/features/security/accessToken';
 
 describe('createInMemoryRateLimiter', () => {
   it('blocks requests after maxRequests inside the same window', () => {

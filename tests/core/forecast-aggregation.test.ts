@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { aggregateForecastByDay } from '@/services/server/forecast/aggregateForecastByDay';
-import type { WeatherProviderForecastEntry } from '@/services/server/weather/ports/weatherProvider';
+import { aggregateForecastByDay } from '@/features/weather/forecast/aggregateForecastByDay';
+import type { WeatherProviderForecastEntry } from '@/features/weather/providers/weatherProviderPort';
 
 const toUnix = (iso: string): number => Math.floor(new Date(iso).getTime() / 1000);
 

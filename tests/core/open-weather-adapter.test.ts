@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   WeatherProviderConfigurationError,
   WeatherProviderUpstreamError,
-} from '@/services/server/weather/errors';
-import { createOpenWeatherWeatherProvider } from '@/services/server/weather/adapters/openWeather/openWeatherWeatherProvider';
+} from '@/features/weather/providers/weatherProviderErrors';
+import { createOpenWeatherWeatherProvider } from '@/features/weather/providers/openWeather/openWeatherWeatherProvider';
 
 const mockFetch = vi.fn();
 vi.stubGlobal('fetch', mockFetch);

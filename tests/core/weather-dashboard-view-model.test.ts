@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import type { WeatherAppState } from '@/hooks/useWeatherApp';
-import { buildWeatherDashboardViewModel } from '@/components/dashboard/weatherDashboardViewModel';
-import type { WeatherResponse } from '@/types/weather';
+import type { WeatherAppState } from '@/features/dashboard/hooks/useWeatherApp';
+import { buildWeatherDashboardViewModel } from '@/features/dashboard/weatherDashboardViewModel';
+import type { WeatherResponse } from '@/features/weather/types';
 
 const buildWeatherResponse = (): WeatherResponse => ({
   location: { name: 'Tokyo', country: 'JP', lat: 35.68, lon: 139.69 },

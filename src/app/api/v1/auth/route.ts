@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { appConfig } from '@/lib/config';
-import { APP_SESSION_COOKIE, isValidAccessToken } from '@/services/server/security/accessToken';
+import { appConfig } from '@/config/appConfig';
+import { APP_SESSION_COOKIE, isValidAccessToken } from '@/features/security/accessToken';
 
 export const runtime = 'nodejs';
 

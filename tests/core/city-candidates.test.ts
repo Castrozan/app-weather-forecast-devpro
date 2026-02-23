@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { mapCityCandidates } from '@/services/server/cities/mapCityCandidates';
-import type { WeatherProviderCity } from '@/services/server/weather/ports/weatherProvider';
+import { mapCityCandidates } from '@/features/search/cities/mapCityCandidates';
+import type { WeatherProviderCity } from '@/features/weather/providers/weatherProviderPort';
 
 describe('mapCityCandidates', () => {
   it('normalizes geocode candidates into deterministic city options', () => {

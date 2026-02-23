@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-import { weatherApiClient } from '@/services/client/weatherApiClient';
+import { weatherApiClient } from '@/features/weather/api/weatherApiClient';
 
 export default function AuthPage() {
   const router = useRouter();

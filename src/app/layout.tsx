@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
-import { AppProviders } from '@/components/providers/AppProviders';
+import { AppProviders } from '@/features/dashboard/providers/AppProviders';
 import 'weather-icons/css/weather-icons.min.css';
 import '@/styles/index.css';
 

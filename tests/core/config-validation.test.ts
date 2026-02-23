@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { toValidatedTemperatureUnit } from '@/lib/config';
+import { toValidatedTemperatureUnit } from '@/config/appConfig';
 
 describe('toValidatedTemperatureUnit', () => {
   it('returns metric for the string "metric"', () => {

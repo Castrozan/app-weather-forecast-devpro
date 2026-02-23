@@ -28,9 +28,9 @@ npm run test:e2e:headed  # Playwright with visible browser
 
 Next.js 16 App Router with hexagonal (ports and adapters) service layer. React 19, TypeScript strict, Zod 4 for runtime validation, TanStack Query (`useMutation` only — all fetches are user-triggered, never auto-refetch).
 
-**Styling:** Vanilla CSS with BEM-like classes split across `src/styles/` feature files + design tokens in `src/styles/tokens.css`. No Tailwind, no CSS Modules.
+**Styling:** Vanilla CSS with BEM-like classes colocated in feature `styles/` directories + global design tokens in `src/styles/tokens.css`. No Tailwind, no CSS Modules.
 
-**Icons:** `lucide-react` for UI icons, `weather-icons` CSS font for weather conditions (mapped through `shared/icons/weatherIconClass.ts`).
+**Icons:** `lucide-react` for UI icons, `weather-icons` CSS font for weather conditions (mapped through `features/weather/icons/weatherIconClass.ts`).
 
 **Animations:** `framer-motion` for enter/exit/stagger transitions. Config centralized in `src/shared/animation/`.
 
@@ -38,23 +38,49 @@ Next.js 16 App Router with hexagonal (ports and adapters) service layer. React 1
 
 ### Directory Structure
 
+Feature-based structure (Bulletproof React convention). Features are isolated domains that don't import from each other at runtime — composition happens in `app/` routes. Unidirectional flow: `shared → features → app`.
+
 ```
 src/
-  app/                          Next.js routing (thin pages + API handlers)
-    api/v1/                     API routes (auth, cities, weather)
-  components/                   UI components by feature domain
-    dashboard/                  App shell orchestrator + view model
-    providers/                  App-level wiring (QueryClient, ErrorBoundary, Toaster)
-    search/                     Search sidebar (form, candidates, disclaimer)
-    weather/                    Weather display (current, forecast, skeleton, disclaimer)
-  hooks/                        Client-side composable hooks
-  lib/                          Configuration + client utilities
-  services/                     Business logic
-    client/                     Browser-side (API client, geolocation)
-    server/                     Server-side (cache, cities, forecast, security, validation, weather)
-  shared/                       Cross-cutting utilities (animation, icons)
-  styles/                       CSS feature files + design tokens
-  types/                        TypeScript types
+  app/                            Next.js routing only (thin pages + API handlers)
+    api/v1/                       API routes compose features (auth, cities, weather)
+    auth/                         Auth page
+  config/                         App configuration and defaults
+  shared/                         Cross-cutting utilities (no domain logic)
+    animation/                    Framer-motion (easings, variants, AnimatedValue)
+    infrastructure/               Query client, in-memory cache
+  styles/                         Global CSS foundation (tokens, reset, base, layout)
+  features/                       Domain feature modules
+    weather/                      WEATHER DOMAIN
+      types.ts                    Core weather types
+      units.ts                    Temperature/wind unit helpers
+      weatherFacade.ts            Server-side orchestrator (cache → provider → aggregate)
+      providers/                  Hexagonal ports + adapters (OpenWeather, Open-Meteo)
+      forecast/                   Forecast aggregation and timezone conversion
+      validation/                 Weather query parsing
+      api/                        Browser-side fetch client
+      hooks/                      useWeatherLoader
+      icons/                      Weather icon class mapping
+      components/                 Weather display (current, forecast, disclaimer)
+      styles/                     Weather-specific CSS
+    search/                       SEARCH/CITIES DOMAIN
+      cities/                     City candidate mapping (pure mapper)
+      hooks/                      useWeatherSearch
+      components/                 Sidebar, search form, candidates, unit toggle
+      styles/                     Search-specific CSS
+    geolocation/                  GEOLOCATION DOMAIN
+      requestUserCoordinates.ts   Browser geolocation API
+      hooks/                      useGeolocationBootstrap
+    security/                     AUTH/SECURITY DOMAIN
+      accessToken.ts              Token validation
+      rateLimiter.ts              In-memory rate limiter
+      requestSecurity.ts          Request verification middleware
+    dashboard/                    APP SHELL ORCHESTRATOR
+      weatherDashboardViewModel.ts
+      hooks/                      useWeatherApp (composes all feature hooks)
+      components/                 WeatherDashboard, error fallback
+      providers/                  AppProviders (QueryClient, ErrorBoundary, Toaster)
+      styles/                     Dashboard-specific CSS
 ```
 
 ### Data Flow
@@ -69,7 +95,7 @@ Browser hooks (useWeatherApp)
 
 ### Key Patterns
 
-- **WeatherProviderPort** (`services/server/weather/ports/`) — stable interface for weather data. Adapters in `adapters/` are swappable. `withFallbackWeatherProvider` composes primary+fallback.
+- **WeatherProviderPort** (`features/weather/providers/`) — stable interface for weather data. Adapters in `openWeather/` and `openMeteo/` are swappable. `withFallbackWeatherProvider` composes primary+fallback.
 - **Provider resolution** is a lazy singleton in `resolveWeatherProvider.ts` — OpenWeather primary with Open-Meteo fallback when `OPENWEATHER_API_KEY` is set, Open-Meteo alone otherwise.
 - **Cache key** is `lat:lon:units`. Display name (city name or "Near You") is overlaid post-cache so identical coordinates share one upstream hit.
 - **View model** (`weatherDashboardViewModel.ts`) derives UI state (`shouldShowSkeleton`, `controlsDisabled`, `weatherContentKey`) from hook state — components stay purely presentational.
@@ -93,4 +119,4 @@ No global store. All state lives in three composable hooks assembled by `useWeat
 
 ### Environment
 
-Copy `.env.example` to `.env.local`. All config is centralized in `src/lib/config.ts` — never read `process.env` directly elsewhere. `APP_ACCESS_TOKEN` gates the app behind `/auth` login when set; leave empty for open access.
+Copy `.env.example` to `.env.local`. All config is centralized in `src/config/appConfig.ts` — never read `process.env` directly elsewhere. `APP_ACCESS_TOKEN` gates the app behind `/auth` login when set; leave empty for open access.

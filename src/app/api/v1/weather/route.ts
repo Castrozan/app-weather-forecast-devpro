@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { getWeatherByCoordinates } from '@/services/server/weatherFacade';
-import { handleWeatherProviderError } from '@/services/server/weather/handleWeatherProviderError';
-import { verifyRateLimit, verifySession } from '@/services/server/security/requestSecurity';
+import { getWeatherByCoordinates } from '@/features/weather/weatherFacade';
+import { handleWeatherProviderError } from '@/features/weather/providers/handleWeatherProviderError';
+import { verifyRateLimit, verifySession } from '@/features/security/requestSecurity';
 
-import { parseWeatherQuery } from '@/services/server/validation/parseWeatherQuery';
+import { parseWeatherQuery } from '@/features/weather/validation/parseWeatherQuery';
 
 export const runtime = 'nodejs';
 

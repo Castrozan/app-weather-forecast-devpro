@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { WeatherProviderUpstreamError } from '@/services/server/weather/errors';
-import { createProviderWithFallback } from '@/services/server/weather/withFallbackWeatherProvider';
-import type { WeatherProviderPort } from '@/services/server/weather/ports/weatherProvider';
+import { WeatherProviderUpstreamError } from '@/features/weather/providers/weatherProviderErrors';
+import { createProviderWithFallback } from '@/features/weather/providers/withFallbackWeatherProvider';
+import type { WeatherProviderPort } from '@/features/weather/providers/weatherProviderPort';
 
 const buildMockProvider = (name: string): WeatherProviderPort => ({
   name,

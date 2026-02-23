@@ -1,9 +1,9 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { WeatherDashboard } from '@/components/dashboard/WeatherDashboard';
-import { appConfig, clientConfig } from '@/lib/config';
-import { APP_SESSION_COOKIE, isValidAccessToken } from '@/services/server/security/accessToken';
+import { WeatherDashboard } from '@/features/dashboard/components/WeatherDashboard';
+import { appConfig, clientConfig } from '@/config/appConfig';
+import { APP_SESSION_COOKIE, isValidAccessToken } from '@/features/security/accessToken';
 
 export default async function Home() {
   if (appConfig.appAccessToken) {
