@@ -56,6 +56,7 @@ export const useWeatherSearch = (
 
       if (cities.length === 0) {
         setCandidateCities([]);
+        toast.info(`No cities found for "${query}".`);
         return;
       }
 
