@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import type {
   CityCandidate,
@@ -31,49 +31,6 @@ const wait = async (durationMs: number): Promise<void> => {
   await new Promise((resolve) => {
     setTimeout(resolve, durationMs);
   });
-};
-
-const denyGeolocationPermission = async (page: Page) => {
-  await page.addInitScript(() => {
-    if (!navigator.permissions) {
-      return;
-    }
-
-    Object.defineProperty(navigator.permissions, 'query', {
-      configurable: true,
-      value: async () => ({ state: 'denied' as const }),
-    });
-  });
-};
-
-const grantGeolocationPermission = async (page: Page, lat: number, lon: number) => {
-  await page.addInitScript(
-    (position: { lat: number; lon: number }) => {
-      if (navigator.permissions) {
-        Object.defineProperty(navigator.permissions, 'query', {
-          configurable: true,
-          value: async () => ({ state: 'granted' as const }),
-        });
-      }
-
-      if (!navigator.geolocation) {
-        return;
-      }
-
-      Object.defineProperty(navigator.geolocation, 'getCurrentPosition', {
-        configurable: true,
-        value: (onSuccess: (position: GeolocationPosition) => void) => {
-          onSuccess({
-            coords: {
-              latitude: position.lat,
-              longitude: position.lon,
-            } as GeolocationCoordinates,
-          } as GeolocationPosition);
-        },
-      });
-    },
-    { lat, lon },
-  );
 };
 
 const buildWeatherPayload = (
@@ -195,9 +152,7 @@ const buildWeatherPayload = (
 };
 
 test.describe('Weather dashboard', () => {
-  test('loads default city weather and animates content into view', async ({ page }) => {
-    await denyGeolocationPermission(page);
-
+  test('loads default city weather on first visit', async ({ page }) => {
     await page.route('**/api/v1/weather?**', async (route) => {
       const url = new URL(route.request().url());
       const units = (url.searchParams.get('units') ?? 'metric') as TemperatureUnit;
@@ -223,7 +178,6 @@ test.describe('Weather dashboard', () => {
 
   test('searches, selects a city, and toggles units', async ({ page }) => {
     let weatherRequests = 0;
-    await denyGeolocationPermission(page);
 
     await page.route('**/api/v1/cities?**', async (route) => {
       const url = new URL(route.request().url());
@@ -294,8 +248,6 @@ test.describe('Weather dashboard', () => {
   });
 
   test('keeps current weather visible when no city matches query', async ({ page }) => {
-    await denyGeolocationPermission(page);
-
     await page.route('**/api/v1/cities?**', async (route) => {
       await route.fulfill({
         status: 200,
@@ -333,70 +285,9 @@ test.describe('Weather dashboard', () => {
     await expect(page.locator('.forecast-card')).toHaveCount(5);
   });
 
-  test('loads user location directly when geolocation is already granted', async ({ page }) => {
-    await grantGeolocationPermission(page, 34.0522, -118.2437);
-
-    await page.route('**/api/v1/cities?**', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          query: '',
-          cities: [],
-        }),
-      });
-    });
-
-    await page.route('**/api/v1/weather?**', async (route) => {
-      const url = new URL(route.request().url());
-      const units = (url.searchParams.get('units') ?? 'metric') as TemperatureUnit;
-      const city = url.searchParams.get('city') ?? 'Near You';
-      const country = url.searchParams.get('country') ?? 'Local';
-      const lat = Number(url.searchParams.get('lat') ?? '34.0522');
-      const lon = Number(url.searchParams.get('lon') ?? '-118.2437');
-
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(buildWeatherPayload(city, country, lat, lon, units)),
-      });
-    });
-
-    await page.goto('/');
-
-    await expect(page.locator('.current-city')).toHaveText('Near You');
-    await expect(page.getByLabel('Search')).toHaveValue('');
-  });
-
-  test('stays on default city without error when geolocation is denied', async ({ page }) => {
-    await denyGeolocationPermission(page);
-
-    await page.route('**/api/v1/weather?**', async (route) => {
-      const url = new URL(route.request().url());
-      const units = (url.searchParams.get('units') ?? 'metric') as TemperatureUnit;
-      const city = url.searchParams.get('city') ?? 'Las Vegas';
-      const country = url.searchParams.get('country') ?? 'United States';
-      const lat = Number(url.searchParams.get('lat') ?? '36.1699');
-      const lon = Number(url.searchParams.get('lon') ?? '-115.1398');
-
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(buildWeatherPayload(city, country, lat, lon, units)),
-      });
-    });
-
-    await page.goto('/');
-
-    await expect(page.locator('.current-city')).toHaveText('Las Vegas');
-    await expect(page.locator('.weather-content')).toBeVisible();
-  });
-
   test('auto-selects city and loads weather when search returns exactly one result', async ({
     page,
   }) => {
-    await denyGeolocationPermission(page);
-
     const singleCityCandidate = cityCandidates[0];
 
     await page.route('**/api/v1/cities?**', async (route) => {
@@ -440,8 +331,6 @@ test.describe('Weather dashboard', () => {
   });
 
   test('shows error toast when weather API returns a server error', async ({ page }) => {
-    await denyGeolocationPermission(page);
-
     let weatherCallCount = 0;
 
     await page.route('**/api/v1/weather?**', async (route) => {
@@ -487,8 +376,6 @@ test.describe('Weather dashboard', () => {
   });
 
   test('shows error toast when city search API returns a server error', async ({ page }) => {
-    await denyGeolocationPermission(page);
-
     await page.route('**/api/v1/weather?**', async (route) => {
       const url = new URL(route.request().url());
       const units = (url.searchParams.get('units') ?? 'metric') as TemperatureUnit;

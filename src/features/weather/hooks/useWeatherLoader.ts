@@ -7,21 +7,13 @@ import { toast } from 'sonner';
 import { weatherApiClient } from '@/features/weather/api/weatherApiClient';
 import type { CityCandidate, TemperatureUnit, WeatherResponse } from '@/features/weather/types';
 
-type LoadWeatherOptions = {
-  preserveWeatherOnError?: boolean;
-};
-
 export type WeatherLoaderState = {
   weather: WeatherResponse | null;
   weatherError: string | null;
   units: TemperatureUnit;
   isLoadingWeather: boolean;
   currentUnitsRef: React.MutableRefObject<TemperatureUnit>;
-  loadWeatherForCity: (
-    city: CityCandidate,
-    nextUnits: TemperatureUnit,
-    options?: LoadWeatherOptions,
-  ) => Promise<void>;
+  loadWeatherForCity: (city: CityCandidate, nextUnits: TemperatureUnit) => Promise<void>;
   setUnits: (nextUnit: TemperatureUnit, selectedCity: CityCandidate | null) => Promise<void>;
 };
 
@@ -48,11 +40,7 @@ export const useWeatherLoader = (defaultUnit: TemperatureUnit): WeatherLoaderSta
   });
 
   const loadWeatherForCity = useCallback(
-    async (
-      city: CityCandidate,
-      nextUnits: TemperatureUnit,
-      options: LoadWeatherOptions = {},
-    ): Promise<void> => {
+    async (city: CityCandidate, nextUnits: TemperatureUnit): Promise<void> => {
       try {
         const weatherData = await weatherMutation.mutateAsync({
           lat: city.lat,
@@ -68,9 +56,7 @@ export const useWeatherLoader = (defaultUnit: TemperatureUnit): WeatherLoaderSta
           error instanceof Error ? error.message : 'Failed to load weather data.';
         setWeatherError(weatherErrorMessage);
         toast.error(weatherErrorMessage);
-        if (!options.preserveWeatherOnError) {
-          setWeather(null);
-        }
+        setWeather(null);
       }
     },
     [weatherMutation],

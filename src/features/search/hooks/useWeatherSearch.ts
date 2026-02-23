@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -13,7 +13,6 @@ export type WeatherSearchState = {
   selectedCity: CityCandidate | null;
   isSearching: boolean;
   searchError: string | null;
-  hasUserInteractionRef: React.MutableRefObject<boolean>;
   setCityQuery: (value: string) => void;
   setSelectedCity: (city: CityCandidate) => void;
   setCandidateCities: (cities: CityCandidate[]) => void;
@@ -29,20 +28,13 @@ export const useWeatherSearch = (
   const [candidateCities, setCandidateCities] = useState<CityCandidate[]>([]);
   const [selectedCity, setSelectedCity] = useState<CityCandidate | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
-  const hasUserInteractionRef = useRef(false);
 
   const searchMutation = useMutation({
     mutationFn: weatherApiClient.fetchCities,
   });
 
-  const setCityQuery = useCallback((value: string): void => {
-    hasUserInteractionRef.current = true;
-    setCityQueryState(value);
-  }, []);
-
   const selectCity = useCallback(
     async (city: CityCandidate): Promise<void> => {
-      hasUserInteractionRef.current = true;
       setSelectedCity(city);
       setCandidateCities([]);
       setCityQueryState(city.name);
@@ -52,7 +44,6 @@ export const useWeatherSearch = (
   );
 
   const search = useCallback(async (): Promise<void> => {
-    hasUserInteractionRef.current = true;
     const query = cityQueryState.trim();
 
     if (!query) {
@@ -88,8 +79,7 @@ export const useWeatherSearch = (
     selectedCity,
     isSearching: searchMutation.isPending,
     searchError,
-    hasUserInteractionRef,
-    setCityQuery,
+    setCityQuery: setCityQueryState,
     setSelectedCity,
     setCandidateCities,
     selectCity,

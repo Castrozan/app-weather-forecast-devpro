@@ -1,8 +1,10 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+
+import { DEFAULT_CITY } from '@/config/defaultCity';
 import type { CityCandidate, TemperatureUnit, WeatherResponse } from '@/features/weather/types';
 
-import { useGeolocationBootstrap } from '@/features/geolocation/hooks/useGeolocationBootstrap';
 import { useWeatherLoader } from '@/features/weather/hooks/useWeatherLoader';
 import { useWeatherSearch } from '@/features/search/hooks/useWeatherSearch';
 
@@ -24,16 +26,18 @@ export type WeatherAppState = {
 
 export const useWeatherApp = (defaultUnit: TemperatureUnit = 'metric'): WeatherAppState => {
   const loader = useWeatherLoader(defaultUnit);
-
   const searchState = useWeatherSearch(loader.units, loader.loadWeatherForCity);
+  const hasLoadedDefaultCityRef = useRef(false);
 
-  useGeolocationBootstrap({
-    currentUnitsRef: loader.currentUnitsRef,
-    hasUserInteractionRef: searchState.hasUserInteractionRef,
-    setSelectedCity: searchState.setSelectedCity,
-    setCandidateCities: searchState.setCandidateCities,
-    loadWeatherForCity: loader.loadWeatherForCity,
-  });
+  useEffect(() => {
+    if (hasLoadedDefaultCityRef.current) {
+      return;
+    }
+
+    hasLoadedDefaultCityRef.current = true;
+    searchState.setSelectedCity(DEFAULT_CITY);
+    void loader.loadWeatherForCity(DEFAULT_CITY, loader.currentUnitsRef.current);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     cityQuery: searchState.cityQuery,
