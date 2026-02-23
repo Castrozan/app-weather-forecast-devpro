@@ -14,8 +14,6 @@ export const toValidatedTemperatureUnit = (input: string | undefined): Temperatu
 
 export const appConfig = {
   appAccessToken: process.env.APP_ACCESS_TOKEN ?? '',
-  rateLimitWindowMs: toInteger(process.env.RATE_LIMIT_WINDOW_MS, 60_000),
-  rateLimitMaxRequests: toInteger(process.env.RATE_LIMIT_MAX_REQUESTS, 60),
   cacheTtlSeconds: toInteger(process.env.CACHE_TTL_SECONDS, 300),
   openWeatherApiKey: process.env.OPENWEATHER_API_KEY ?? '',
 };

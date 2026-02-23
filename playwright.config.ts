@@ -33,8 +33,6 @@ export default defineConfig({
     env: {
       ...process.env,
       APP_ACCESS_TOKEN: '',
-      RATE_LIMIT_WINDOW_MS: '60000',
-      RATE_LIMIT_MAX_REQUESTS: '500',
       CACHE_TTL_SECONDS: '300',
       NEXT_PUBLIC_DEFAULT_TEMPERATURE_UNIT: 'metric',
     },

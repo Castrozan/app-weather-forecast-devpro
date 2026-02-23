@@ -21,11 +21,11 @@ npm run build        # production build
 
 ## Decisions
 
-**Next.js API routes over a separate server** — the API layer is thin (rate limit, auth, Zod validation, delegate to facade). Hexagonal structure means `services/server/` extracts to standalone Node if needed — swap transport, domain stays untouched.
+**Next.js API routes over a separate server** — the API layer is thin (auth, Zod validation, delegate to facade). Hexagonal structure means the service layer extracts to standalone Node if needed — swap transport, domain stays untouched.
 
 **Port/adapter weather providers** — `WeatherProviderPort` is a stable interface. OpenWeather and Open-Meteo are swappable adapters. Adding a provider means one file in `adapters/`, nothing else changes. Fallback is automatic and silent.
 
-**In-memory cache and rate limiter** — correct for single-process deploys (Render). Interfaces are injectable — swap to Redis without touching the facade or routes.
+**In-memory cache** — correct for single-process deploys. Interface is injectable — swap to Redis without touching the facade or routes.
 
 **No global store** — three composable hooks feed a pure view model that derives all UI state. Components are presentational. Would only add a store if state needed to cross page boundaries.
 
