@@ -41,8 +41,8 @@ export const candidateItemTransition = {
 };
 
 export const valueSwapAnimation = {
-  initial: { opacity: 0, y: 6, filter: 'blur(2px)' },
+  initial: { opacity: 0, y: 8, filter: 'blur(3px)' },
   animate: { opacity: 1, y: 0, filter: 'blur(0px)' },
-  exit: { opacity: 0, y: -6, filter: 'blur(2px)' },
-  transition: { duration: 0.22, ease: smoothDecelerationEasing },
+  exit: { opacity: 0, y: -8, filter: 'blur(3px)' },
+  transition: { duration: 0.36, ease: smoothDecelerationEasing },
 };
