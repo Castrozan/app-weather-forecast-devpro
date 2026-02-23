@@ -10,16 +10,6 @@
   gap: 18px;
 }
 
-.weather-panel::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
-  background-size: 16px 16px;
-  opacity: 0.1;
-}
-
 .panel-header {
   position: relative;
   z-index: 1;
