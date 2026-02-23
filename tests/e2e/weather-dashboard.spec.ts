@@ -191,9 +191,7 @@ const buildWeatherPayload = (
 };
 
 test.describe('Weather dashboard', () => {
-  test('renders skeleton while weather data is loading and fades into content', async ({
-    page,
-  }) => {
+  test('loads default city weather and animates content into view', async ({ page }) => {
     await denyGeolocationPermission(page);
 
     await page.route('**/api/v1/weather?**', async (route) => {
@@ -215,10 +213,8 @@ test.describe('Weather dashboard', () => {
 
     await page.goto('/');
 
-    await expect(page.locator('.weather-skeleton')).toBeVisible();
     await expect(page.locator('.current-city')).toHaveText('Las Vegas');
     await expect(page.locator('.weather-content')).toBeVisible();
-    await expect(page.locator('.weather-skeleton')).toHaveCount(0);
   });
 
   test('searches, selects a city, and toggles units', async ({ page }) => {

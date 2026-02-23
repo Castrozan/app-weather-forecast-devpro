@@ -33,7 +33,6 @@ export const WeatherDashboard = ({ defaultUnit }: WeatherDashboardProps) => {
       <WeatherMainPanel
         weatherData={vm.weatherData}
         weatherContentKey={vm.weatherContentKey}
-        shouldShowSkeleton={vm.shouldShowSkeleton}
         unitToggle={
           <UnitToggle
             value={app.units}

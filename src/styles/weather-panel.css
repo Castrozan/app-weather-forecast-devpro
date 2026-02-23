@@ -1,5 +1,4 @@
 .weather-panel {
-  position: relative;
   display: flex;
   flex-direction: column;
   overflow: hidden auto;
@@ -13,11 +12,6 @@
 
 .weather-panel::-webkit-scrollbar {
   display: none;
-}
-
-.panel-header {
-  position: relative;
-  z-index: 1;
 }
 
 .panel-title {
@@ -36,14 +30,7 @@
   font-weight: 700;
 }
 
-.weather-stage {
-  position: relative;
-  z-index: 1;
-}
-
 .weather-content {
-  position: relative;
-  z-index: 2;
   display: grid;
   gap: 12px;
 }

@@ -4,11 +4,8 @@ import { useCallback, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import { withMinimumDuration } from '@/lib/minimumDuration';
 import { weatherApiClient } from '@/services/client/weatherApiClient';
 import type { CityCandidate, TemperatureUnit, WeatherResponse } from '@/types/weather';
-
-const MIN_WEATHER_LOADING_DURATION_MS = 500;
 
 type LoadWeatherOptions = {
   preserveWeatherOnError?: boolean;
@@ -47,11 +44,7 @@ export const useWeatherLoader = (defaultUnit: TemperatureUnit): WeatherLoaderSta
       units: TemperatureUnit;
       city: string;
       country: string;
-    }) =>
-      withMinimumDuration(
-        () => weatherApiClient.fetchWeather(lat, lon, nextUnits, { city, country }),
-        MIN_WEATHER_LOADING_DURATION_MS,
-      ),
+    }) => weatherApiClient.fetchWeather(lat, lon, nextUnits, { city, country }),
   });
 
   const loadWeatherForCity = useCallback(

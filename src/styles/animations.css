@@ -23,11 +23,3 @@
     transform: translateY(0);
   }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .weather-skeleton-icon,
-  .weather-skeleton-icon-sm {
-    animation: none;
-    background: #5f86a8;
-  }
-}

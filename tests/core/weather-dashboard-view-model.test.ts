@@ -57,42 +57,6 @@ describe('buildWeatherDashboardViewModel', () => {
     });
   });
 
-  describe('shouldShowSkeleton', () => {
-    it('is false when weather exists even while loading (keeps stale content visible)', () => {
-      const vm = buildWeatherDashboardViewModel(
-        buildBaseAppState({ isLoadingWeather: true, weather: buildWeatherResponse() }),
-      );
-
-      expect(vm.shouldShowSkeleton).toBe(false);
-    });
-
-    it('is true when no weather and isLoadingWeather is true', () => {
-      const vm = buildWeatherDashboardViewModel(buildBaseAppState({ isLoadingWeather: true }));
-
-      expect(vm.shouldShowSkeleton).toBe(true);
-    });
-
-    it('is false when weather exists and not loading', () => {
-      const vm = buildWeatherDashboardViewModel(
-        buildBaseAppState({ weather: buildWeatherResponse() }),
-      );
-
-      expect(vm.shouldShowSkeleton).toBe(false);
-    });
-
-    it('is false when no weather and not loading or searching (error state)', () => {
-      const vm = buildWeatherDashboardViewModel(buildBaseAppState());
-
-      expect(vm.shouldShowSkeleton).toBe(false);
-    });
-
-    it('is true when no weather and isSearching is true', () => {
-      const vm = buildWeatherDashboardViewModel(buildBaseAppState({ isSearching: true }));
-
-      expect(vm.shouldShowSkeleton).toBe(true);
-    });
-  });
-
   describe('weatherContentKey', () => {
     it('includes lat and lon to force remount on city change', () => {
       const weather = buildWeatherResponse();

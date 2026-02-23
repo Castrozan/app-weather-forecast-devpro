@@ -7,13 +7,6 @@ export const weatherContentEnterAnimation = {
   transition: { duration: 0.52, ease: smoothDecelerationEasing },
 };
 
-export const skeletonLayerEnterAnimation = {
-  initial: { opacity: 0, y: 8, filter: 'saturate(0.92)' },
-  animate: { opacity: 1, y: 0, filter: 'saturate(1)' },
-  exit: { opacity: 0, y: -4 },
-  transition: { duration: 0.52, ease: smoothDecelerationEasing },
-};
-
 export const forecastGridStaggerVariants = {
   animate: {
     transition: { staggerChildren: 0.06 },
