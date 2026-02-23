@@ -1,4 +1,4 @@
-import { appConfig } from '@/config/appConfig';
+import { appConfig, FORECAST_DAYS } from '@/config/appConfig';
 import type { TemperatureUnit, WeatherResponse } from '@/features/weather/types';
 import { createInMemoryTtlCache } from '@/shared/infrastructure/cache/inMemoryCache';
 import { aggregateForecastByDay } from '@/features/weather/forecast/aggregateForecastByDay';
@@ -85,7 +85,7 @@ export const getWeatherByCoordinates = async (
   const daily = aggregateForecastByDay(
     weatherData.forecastEntries,
     weatherData.timezoneOffsetSeconds,
-    5,
+    FORECAST_DAYS,
   ).map((day) => ({
     ...day,
     label: mapDateToForecastLabel(day.date, todayDateKey),

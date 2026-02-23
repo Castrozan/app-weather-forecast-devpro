@@ -1,3 +1,4 @@
+import { FORECAST_DAYS } from '@/config/appConfig';
 import type { WeatherProviderForecastEntry } from '@/features/weather/providers/weatherProviderPort';
 
 import {
@@ -45,7 +46,7 @@ const pickRepresentativeEntry = (
 export const aggregateForecastByDay = (
   entries: WeatherProviderForecastEntry[],
   timezoneOffsetSeconds: number,
-  days = 5,
+  days = FORECAST_DAYS,
 ): AggregatedForecastDay[] => {
   const grouped = new Map<string, GroupedDay>();
 

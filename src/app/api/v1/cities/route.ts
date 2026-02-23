@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { CITY_SEARCH_RESULTS_LIMIT } from '@/config/appConfig';
 import { mapCityCandidates } from '@/features/search/cities/mapCityCandidates';
 import { handleWeatherProviderError } from '@/features/weather/providers/handleWeatherProviderError';
 import { getWeatherProvider } from '@/features/weather/providers/resolveWeatherProvider';
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 
   try {
-    const rawCities = await getWeatherProvider().searchCities(query, 5);
+    const rawCities = await getWeatherProvider().searchCities(query, CITY_SEARCH_RESULTS_LIMIT);
     const cities = mapCityCandidates(rawCities);
     return NextResponse.json({ query, cities });
   } catch (error) {

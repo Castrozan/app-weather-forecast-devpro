@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { CITY_SEARCH_RESULTS_LIMIT } from '@/config/appConfig';
 import {
   WeatherProviderConfigurationError,
   WeatherProviderUpstreamError,
@@ -139,7 +140,7 @@ export const createOpenWeatherWeatherProvider = (apiKey: string): WeatherProvide
     name: PROVIDER_NAME,
 
     async searchCities(query: string, limit: number): Promise<WeatherProviderCity[]> {
-      const clampedLimit = Math.max(1, Math.min(limit, 5));
+      const clampedLimit = Math.max(1, Math.min(limit, CITY_SEARCH_RESULTS_LIMIT));
       const search = new URLSearchParams({
         q: query,
         limit: String(clampedLimit),

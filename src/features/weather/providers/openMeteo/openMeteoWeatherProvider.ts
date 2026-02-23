@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { FORECAST_DAYS } from '@/config/appConfig';
 import { convertUnixTimestampToLocalDateKey } from '@/features/weather/forecast/timezoneConversion';
 import { WeatherProviderUpstreamError } from '@/features/weather/providers/weatherProviderErrors';
 import type {
@@ -225,7 +226,7 @@ export const createOpenMeteoWeatherProvider = (): WeatherProviderPort => {
         longitude: String(input.lon),
         current: 'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,is_day',
         hourly: 'temperature_2m,weather_code,is_day',
-        forecast_days: '5',
+        forecast_days: String(FORECAST_DAYS),
         temperature_unit: toTemperatureUnit(input.units),
         wind_speed_unit: toWindSpeedUnit(input.units),
         timezone: 'auto',
