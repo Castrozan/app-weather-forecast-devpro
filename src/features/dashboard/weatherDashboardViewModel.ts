@@ -5,6 +5,7 @@ export type WeatherDashboardViewModel = {
   weatherContentKey: string;
   weatherData: WeatherResponse | null;
   controlsDisabled: boolean;
+  showLoadingSpinner: boolean;
 };
 
 const resolveWeatherContentKey = (weather: WeatherResponse): string => {
@@ -18,5 +19,6 @@ export const buildWeatherDashboardViewModel = (app: WeatherAppState): WeatherDas
       : 'empty-weather-content',
     weatherData: app.weather,
     controlsDisabled: app.isSearching || app.isLoadingWeather,
+    showLoadingSpinner: app.isLoadingWeather,
   };
 };

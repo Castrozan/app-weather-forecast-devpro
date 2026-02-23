@@ -29,6 +29,28 @@
   font-weight: 700;
 }
 
+.weather-loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 200px;
+}
+
+.weather-loading-spinner-icon {
+  color: var(--text-main);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .weather-content {
   display: grid;
   gap: 10px;

@@ -1,3 +1,5 @@
+import { Loader2 } from 'lucide-react';
+
 import type { TemperatureUnit, WeatherResponse } from '@/features/weather/types';
 
 import { PanelDisclaimer } from './PanelDisclaimer';
@@ -9,6 +11,7 @@ type WeatherMainPanelProps = {
   weatherContentKey: string;
   onToggleUnits: (unit: TemperatureUnit) => void;
   controlsDisabled: boolean;
+  showLoadingSpinner: boolean;
 };
 
 export const WeatherMainPanel = ({
@@ -16,6 +19,7 @@ export const WeatherMainPanel = ({
   weatherContentKey,
   onToggleUnits,
   controlsDisabled,
+  showLoadingSpinner,
 }: WeatherMainPanelProps) => {
   return (
     <section className="weather-panel">
@@ -24,7 +28,11 @@ export const WeatherMainPanel = ({
         <p className="panel-subtitle">Current conditions and daily outlook</p>
       </header>
       <div className="weather-stage">
-        {weatherData ? (
+        {showLoadingSpinner ? (
+          <div className="weather-loading-spinner" aria-label="Loading weather data">
+            <Loader2 className="weather-loading-spinner-icon" size={48} />
+          </div>
+        ) : weatherData ? (
           <div className="weather-content" key={weatherContentKey}>
             <CurrentWeatherPanel
               weather={weatherData}

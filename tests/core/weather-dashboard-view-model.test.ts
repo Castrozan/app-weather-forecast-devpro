@@ -57,6 +57,26 @@ describe('buildWeatherDashboardViewModel', () => {
     });
   });
 
+  describe('showLoadingSpinner', () => {
+    it('is false when not loading weather', () => {
+      const vm = buildWeatherDashboardViewModel(buildBaseAppState());
+
+      expect(vm.showLoadingSpinner).toBe(false);
+    });
+
+    it('is true when isLoadingWeather is true', () => {
+      const vm = buildWeatherDashboardViewModel(buildBaseAppState({ isLoadingWeather: true }));
+
+      expect(vm.showLoadingSpinner).toBe(true);
+    });
+
+    it('is false when only isSearching is true', () => {
+      const vm = buildWeatherDashboardViewModel(buildBaseAppState({ isSearching: true }));
+
+      expect(vm.showLoadingSpinner).toBe(false);
+    });
+  });
+
   describe('weatherContentKey', () => {
     it('includes lat and lon to force remount on city change', () => {
       const weather = buildWeatherResponse();

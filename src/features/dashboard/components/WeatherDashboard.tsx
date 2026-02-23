@@ -36,6 +36,7 @@ export const WeatherDashboard = ({ defaultUnit }: WeatherDashboardProps) => {
           void app.setUnits(unit);
         }}
         controlsDisabled={vm.controlsDisabled}
+        showLoadingSpinner={vm.showLoadingSpinner}
       />
     </main>
   );
