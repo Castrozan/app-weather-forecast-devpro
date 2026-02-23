@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
 import { AppProviders } from '@/components/providers/AppProviders';
+import 'react-loading-skeleton/dist/skeleton.css';
 import 'weather-icons/css/weather-icons.min.css';
 import '@/styles/index.css';
 
