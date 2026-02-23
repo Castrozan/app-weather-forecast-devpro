@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { convertUnixTimestampToLocalDateKey } from '@/services/server/forecast/timezoneConversion';
 import { WeatherProviderUpstreamError } from '@/services/server/weather/errors';
 import type {
   FetchWeatherByCoordinatesInput,
@@ -94,10 +95,6 @@ const parseLocalIsoToUnixSeconds = (localIso: string, utcOffsetSeconds: number):
   return naiveUtcSeconds - utcOffsetSeconds;
 };
 
-const toLocalDateKey = (timestampSeconds: number, timezoneOffsetSeconds: number): string => {
-  return new Date((timestampSeconds + timezoneOffsetSeconds) * 1000).toISOString().slice(0, 10);
-};
-
 const normalizeHourlyEntries = (
   hourly: z.infer<typeof forecastResponseSchema>['hourly'],
   timezoneOffsetSeconds: number,
@@ -149,10 +146,16 @@ const deriveCurrentMinMax = (
   timezoneOffsetSeconds: number,
   fallbackTemperature: number,
 ): { min: number; max: number } => {
-  const currentDateKey = toLocalDateKey(currentTimestampSeconds, timezoneOffsetSeconds);
+  const currentDateKey = convertUnixTimestampToLocalDateKey(
+    currentTimestampSeconds,
+    timezoneOffsetSeconds,
+  );
 
   const sameDayEntries = forecastEntries.filter((entry) => {
-    return toLocalDateKey(entry.timestampSeconds, timezoneOffsetSeconds) === currentDateKey;
+    return (
+      convertUnixTimestampToLocalDateKey(entry.timestampSeconds, timezoneOffsetSeconds) ===
+      currentDateKey
+    );
   });
 
   if (sameDayEntries.length === 0) {

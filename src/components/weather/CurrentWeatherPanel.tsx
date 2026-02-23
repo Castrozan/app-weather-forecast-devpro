@@ -4,7 +4,7 @@ import { Droplets, Thermometer, ThermometerSnowflake, Wind } from 'lucide-react'
 import { temperatureUnitSymbol, windSpeedUnitLabel } from '@/lib/weatherUnits';
 import type { WeatherResponse } from '@/types/weather';
 
-import { resolveWeatherIconClass } from './weatherIconClass';
+import { resolveWeatherIconClass } from '@/shared/icons/weatherIconClass';
 
 type CurrentWeatherPanelProps = {
   weather: WeatherResponse;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseWeatherQuery } from '@/app/api/v1/weather/parseWeatherQuery';
+import { parseWeatherQuery } from '@/services/server/validation/parseWeatherQuery';
 
 describe('parseWeatherQuery', () => {
   it('parses valid query params', () => {

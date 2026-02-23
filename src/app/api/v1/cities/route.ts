@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { searchCities } from '@/services/server/cities/searchCities';
-import {
-  isWeatherProviderConfigurationError,
-  isWeatherProviderUpstreamError,
-} from '@/services/server/weather/errors';
+import { handleWeatherProviderError } from '@/services/server/weather/handleWeatherProviderError';
 import { verifyRateLimit, verifySession } from '@/services/server/security/requestSecurity';
 
 export const runtime = 'nodejs';
@@ -39,23 +36,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const cities = await searchCities(query);
     return NextResponse.json({ query, cities });
   } catch (error) {
-    if (isWeatherProviderConfigurationError(error)) {
-      return NextResponse.json(
-        { error: 'Weather provider is not configured on this server.' },
-        { status: 503 },
-      );
-    }
-
-    if (isWeatherProviderUpstreamError(error)) {
-      return NextResponse.json(
-        { error: 'Weather provider is temporarily unavailable.' },
-        { status: 502 },
-      );
-    }
-
-    return NextResponse.json(
-      { error: 'Unable to resolve city search at this time.' },
-      { status: 502 },
-    );
+    return handleWeatherProviderError(error, 'Unable to resolve city search at this time.');
   }
 }

@@ -1,0 +1,114 @@
+.current-weather {
+  position: relative;
+  z-index: 1;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(8px);
+  padding: 18px;
+  display: grid;
+  gap: 16px;
+}
+
+.current-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.current-kicker {
+  margin: 0;
+  color: rgba(232, 247, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-size: 12px;
+}
+
+.current-icon {
+  display: grid;
+  place-items: center;
+  width: 110px;
+  height: 110px;
+  border-radius: 999px;
+  border: 1px solid rgba(176, 228, 255, 0.35);
+  background: linear-gradient(180deg, rgba(21, 76, 126, 0.45), rgba(10, 41, 74, 0.56));
+  box-shadow: 0 12px 22px rgba(6, 13, 26, 0.32);
+}
+
+.current-icon .wi {
+  font-size: 58px;
+  line-height: 1;
+  color: rgba(228, 247, 255, 0.95);
+  text-shadow: 0 10px 16px rgba(3, 12, 24, 0.42);
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding-left: 6px;
+  padding-top: 2px;
+}
+
+.current-city {
+  margin: 4px 0 0;
+  font-family: var(--font-body), 'Inter', sans-serif;
+  font-size: clamp(40px, 6vw, 74px);
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.current-temperature {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.current-temp {
+  margin: 0;
+  font-size: clamp(52px, 7vw, 92px);
+  line-height: 1;
+  font-weight: 700;
+}
+
+.current-description {
+  margin: 10px 0 0;
+  text-transform: capitalize;
+  color: rgba(243, 250, 255, 0.9);
+}
+
+.current-stats {
+  margin: 0;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+}
+
+.current-stat {
+  border: 1px solid rgba(179, 231, 255, 0.22);
+  border-radius: 12px;
+  background: rgba(8, 21, 35, 0.32);
+  padding: 8px 10px;
+}
+
+.current-stat dt {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.current-stat dd {
+  margin: 6px 0 0;
+  font-weight: 700;
+  font-size: 17px;
+}

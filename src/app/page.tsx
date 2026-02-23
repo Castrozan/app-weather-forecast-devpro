@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { WeatherDashboardWithErrorBoundary } from '@/components/shared/WeatherDashboardWithErrorBoundary';
+import { WeatherDashboard } from '@/components/dashboard/WeatherDashboard';
 import { appConfig, clientConfig } from '@/lib/config';
 import { APP_SESSION_COOKIE, isValidAccessToken } from '@/services/server/security/accessToken';
 
@@ -15,5 +15,5 @@ export default async function Home() {
     }
   }
 
-  return <WeatherDashboardWithErrorBoundary defaultUnit={clientConfig.defaultTemperatureUnit} />;
+  return <WeatherDashboard defaultUnit={clientConfig.defaultTemperatureUnit} />;
 }

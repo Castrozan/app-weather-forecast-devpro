@@ -1,0 +1,134 @@
+.weather-skeleton-layer {
+  position: relative;
+  z-index: 3;
+}
+
+.weather-skeleton-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(160deg, var(--surface-main) 0%, var(--surface-main-strong) 100%);
+}
+
+.weather-skeleton {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 12px;
+  will-change: transform, filter;
+}
+
+.current-weather.weather-skeleton-current,
+.weather-skeleton-forecast .forecast-card {
+  border-color: #3a6f98;
+  background: linear-gradient(180deg, #133a5f, #0f3353);
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.weather-skeleton-copy {
+  display: grid;
+  gap: 10px;
+}
+
+.skeleton-line,
+.weather-skeleton-stat,
+.weather-skeleton-icon,
+.weather-skeleton-icon-sm {
+  display: block;
+  border-radius: 10px;
+  background: linear-gradient(100deg, #4f7ca1 0%, #84aace 34%, #4f7ca1 64%);
+  background-size: 220% 100%;
+  animation: skeleton-shimmer 1.55s ease-in-out infinite;
+}
+
+.skeleton-line-kicker {
+  width: 170px;
+  max-width: 100%;
+  height: 14px;
+}
+
+.skeleton-line-city {
+  width: 220px;
+  max-width: 100%;
+  height: clamp(50px, 7.5vw, 92px);
+}
+
+.skeleton-line-text {
+  width: 180px;
+  max-width: 100%;
+  height: 16px;
+}
+
+.skeleton-line-temp {
+  width: 130px;
+  height: clamp(52px, 7vw, 92px);
+}
+
+.weather-skeleton-icon {
+  width: 110px;
+  height: 110px;
+  border-radius: 999px;
+  border-color: #3a6f98;
+  box-shadow: none;
+}
+
+.current-icon.weather-skeleton-icon,
+.forecast-icon.weather-skeleton-icon-sm {
+  border-color: #3a6f98;
+  background: linear-gradient(180deg, #1d527d, #173f62);
+  box-shadow: none;
+}
+
+.weather-skeleton-stat {
+  min-height: 62px;
+}
+
+.weather-skeleton-forecast {
+  gap: 10px;
+}
+
+.skeleton-line-title {
+  width: 240px;
+  max-width: 100%;
+  height: clamp(25px, 3.4vw, 44px);
+}
+
+.skeleton-toggle-pill {
+  width: 90px;
+  height: 36px;
+  border-radius: 999px;
+}
+
+.weather-skeleton-card {
+  justify-items: center;
+  gap: 4px;
+}
+
+.skeleton-line-label {
+  width: 86px;
+  height: 18px;
+}
+
+.weather-skeleton-icon-sm {
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  border-color: #3a6f98;
+  box-shadow: none;
+}
+
+.skeleton-line-description {
+  width: 100%;
+  height: 32px;
+}
+
+.weather-skeleton-minmax-grid {
+  width: 100%;
+}
+
+.weather-skeleton-minmax {
+  width: 100%;
+  height: 27px;
+  border-radius: 9px;
+}

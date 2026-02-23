@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { WeatherAppState } from '@/hooks/useWeatherApp';
-import { buildWeatherDashboardViewModel } from '@/lib/weatherDashboardViewModel';
+import { buildWeatherDashboardViewModel } from '@/components/dashboard/weatherDashboardViewModel';
 import type { WeatherResponse } from '@/types/weather';
 
 const buildWeatherResponse = (): WeatherResponse => ({

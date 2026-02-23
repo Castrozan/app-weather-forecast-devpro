@@ -2,7 +2,7 @@ import clsx from 'clsx';
 
 import { temperatureUnitSymbol } from '@/lib/weatherUnits';
 import type { ForecastDay, TemperatureUnit } from '@/types/weather';
-import { resolveWeatherIconClass } from './weatherIconClass';
+import { resolveWeatherIconClass } from '@/shared/icons/weatherIconClass';
 
 type ForecastCardProps = {
   forecast: ForecastDay;

@@ -1,5 +1,10 @@
 import type { WeatherProviderForecastEntry } from '@/services/server/weather/ports/weatherProvider';
 
+import {
+  convertUnixTimestampToLocalDateKey,
+  convertUnixTimestampToLocalHour,
+} from './timezoneConversion';
+
 export type AggregatedForecastDay = {
   date: string;
   min: number;
@@ -15,22 +20,12 @@ type GroupedDay = {
   entries: WeatherProviderForecastEntry[];
 };
 
-const toLocalDateKey = (timestampSeconds: number, timezoneOffsetSeconds: number): string => {
-  const localDate = new Date((timestampSeconds + timezoneOffsetSeconds) * 1000);
-  return localDate.toISOString().slice(0, 10);
-};
-
-const toLocalHour = (timestampSeconds: number, timezoneOffsetSeconds: number): number => {
-  const localDate = new Date((timestampSeconds + timezoneOffsetSeconds) * 1000);
-  return localDate.getUTCHours();
-};
-
 const pickRepresentativeEntry = (
   entries: WeatherProviderForecastEntry[],
   timezoneOffsetSeconds: number,
 ): WeatherProviderForecastEntry => {
   const midday = entries.find((entry) => {
-    const hour = toLocalHour(entry.timestampSeconds, timezoneOffsetSeconds);
+    const hour = convertUnixTimestampToLocalHour(entry.timestampSeconds, timezoneOffsetSeconds);
     return hour >= 11 && hour <= 14;
   });
 
@@ -55,7 +50,10 @@ export const aggregateForecastByDay = (
   const grouped = new Map<string, GroupedDay>();
 
   for (const entry of entries) {
-    const dateKey = toLocalDateKey(entry.timestampSeconds, timezoneOffsetSeconds);
+    const dateKey = convertUnixTimestampToLocalDateKey(
+      entry.timestampSeconds,
+      timezoneOffsetSeconds,
+    );
     const existing = grouped.get(dateKey);
 
     if (!existing) {

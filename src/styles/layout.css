@@ -1,0 +1,13 @@
+.app-shell {
+  width: min(1180px, 94vw);
+  height: min(840px, calc(100vh - 48px));
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: rgba(7, 12, 21, 0.54);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-md);
+}

@@ -46,7 +46,7 @@ Copy `.env.example` to `.env.local` and configure:
 
 ```bash
 npm run verify        # format + lint + typecheck + unit tests
-npm run test:e2e      # Playwright integration tests (requires running dev server)
+npm run test:e2e      # Playwright integration tests (starts its own dev server)
 ```
 
 Full pipeline:
@@ -70,7 +70,7 @@ npm run build
 - Auth token validation — empty token, disabled mode
 - Weather response caching — TTL expiry, cache hits
 - API query validation — Zod parsing for lat/lon/units
-- Status message classification — typed union discriminant (no string matching)
+- Dashboard view model — skeleton visibility, content keys, controls disabled state
 - Weather icon class resolution
 - Geolocation coordinate request
 
@@ -83,7 +83,11 @@ npm run build
 
 - Full search flow: type city → select from candidates → view weather
 - Unit toggle: switch metric ↔ imperial → weather refetches with new units
-- Empty search result state
+- Auto-select: single search result skips candidate list
+- Empty search result: keeps current weather visible
+- Geolocation: loads local weather when permission already granted
+- Geolocation denied: stays on default city without error
+- Error handling: server errors surface as toast notifications
 
 ## Architecture
 
@@ -91,31 +95,40 @@ npm run build
 
 ```
 src/
-  app/
-    api/v1/          # Transport layer: validates inputs, enforces auth/rate limits
-    page.tsx          # SSR auth gate
-    auth/             # Token login page
-  components/         # Presentational React components only
-  hooks/
-    useWeatherApp.ts  # All client-side state + flow coordination
-  lib/                # Shared utilities (config, cache key, timing)
+  app/                            Next.js routing (thin pages + API handlers)
+    api/v1/                       Transport: validates inputs, enforces auth/rate limits
+    page.tsx                      SSR auth gate → renders WeatherDashboard
+    auth/                         Token login page
+  components/                     UI components by feature domain
+    dashboard/                    App shell orchestrator + view model
+    providers/                    App-level wiring (QueryClient, ErrorBoundary, Toaster)
+    search/                       Sidebar: search form, city candidates, unit toggle
+    weather/                      Main panel: current weather, forecast grid, skeleton
+  hooks/                          Client-side state (composable, assembled by useWeatherApp)
+  lib/                            Configuration + client utilities
   services/
-    client/           # Browser-side API calls
+    client/                       Browser-side API calls + geolocation
     server/
       weather/
-        ports/        # Stable interface: WeatherProviderPort
-        adapters/     # Open-Meteo implementation (swappable)
-      cities/         # Geocoding normalization + deduplication
-      forecast/       # Hourly → daily aggregation
-      cache/          # In-memory TTL cache
-      security/       # Rate limiter + access token validation
-      weatherFacade.ts  # Orchestrates: cache → provider → aggregation → hint overlay
-  types/              # Shared TypeScript types
+        ports/                    Stable interface: WeatherProviderPort
+        adapters/                 OpenWeather + Open-Meteo implementations (swappable)
+        handleWeatherProviderError.ts  Shared error → HTTP status mapping
+      cities/                     Geocoding normalization + deduplication
+      forecast/                   Hourly → daily aggregation + timezone conversion
+      cache/                      In-memory TTL cache
+      security/                   Rate limiter + access token validation
+      validation/                 Query parsing (Zod schemas)
+      weatherFacade.ts            Orchestrates: cache → provider → aggregation → hint overlay
+  shared/                         Cross-cutting utilities
+    animation/                    Framer Motion easing + variant configs
+    icons/                        Weather icon class mapping
+  styles/                         CSS feature files + design tokens
+  types/                          Shared TypeScript types
 tests/
-  core/               # Pure logic unit tests
-  components/         # React component rendering tests
-  api/                # API layer query parsing tests
-  e2e/                # Playwright browser tests
+  core/                           Pure logic unit tests
+  components/                     React component rendering tests
+  api/                            API layer query parsing tests
+  e2e/                            Playwright browser tests
 ```
 
 ### Key Decisions and Tradeoffs
@@ -140,11 +153,7 @@ All data fetches are imperative (triggered by user action or geolocation — nev
 
 The weather cache is keyed by `lat:lon:units`. The display name (city name the user searched, or "Near You" for geolocation) is applied as an overlay after cache lookup. This means the same coordinates from two different search paths share one upstream API hit, while each caller still receives their contextual display name.
 
-**6. Typed status message union instead of string matching**
-
-Status messages use a discriminated union (`kind: 'weather-loading' | 'weather-error' | 'search-loading' | ...`) rather than regex-testing string content. This makes routing in `WeatherDashboard` refactor-safe — changing message copy doesn't silently break UI logic.
-
-**7. Lazy geolocation with user-interaction guard**
+**6. Lazy geolocation with user-interaction guard**
 
 Geolocation runs 1.6 seconds after initial load and is silently cancelled if the user has typed or interacted. This avoids jarring city switches after the user has started a search, while still providing the convenience of local weather for passive viewers.
 

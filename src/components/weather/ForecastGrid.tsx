@@ -1,27 +1,13 @@
 import { motion } from 'framer-motion';
 import type { ReactNode } from 'react';
 
+import {
+  forecastCardEntryVariants,
+  forecastGridStaggerVariants,
+} from '@/shared/animation/variants';
 import type { WeatherResponse } from '@/types/weather';
 
 import { ForecastCard } from './ForecastCard';
-
-const forecastGridStaggerVariants = {
-  animate: {
-    transition: { staggerChildren: 0.06 },
-  },
-};
-
-const smoothDecelerationEasing = [0.16, 1, 0.3, 1] as const;
-
-const forecastCardEntryVariants = {
-  initial: { opacity: 0, y: 12, scale: 0.96 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.38, ease: smoothDecelerationEasing },
-  },
-};
 
 type ForecastGridProps = {
   weather: WeatherResponse;

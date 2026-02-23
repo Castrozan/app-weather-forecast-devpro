@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getWeatherByCoordinates } from '@/services/server/weatherFacade';
-import {
-  isWeatherProviderConfigurationError,
-  isWeatherProviderUpstreamError,
-} from '@/services/server/weather/errors';
+import { handleWeatherProviderError } from '@/services/server/weather/handleWeatherProviderError';
 import { verifyRateLimit, verifySession } from '@/services/server/security/requestSecurity';
 
-import { parseWeatherQuery } from './parseWeatherQuery';
+import { parseWeatherQuery } from '@/services/server/validation/parseWeatherQuery';
 
 export const runtime = 'nodejs';
 
@@ -47,23 +44,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    if (isWeatherProviderConfigurationError(error)) {
-      return NextResponse.json(
-        { error: 'Weather provider is not configured on this server.' },
-        { status: 503 },
-      );
-    }
-
-    if (isWeatherProviderUpstreamError(error)) {
-      return NextResponse.json(
-        { error: 'Weather provider is temporarily unavailable.' },
-        { status: 502 },
-      );
-    }
-
-    return NextResponse.json(
-      { error: 'Unable to load weather data at this time.' },
-      { status: 502 },
-    );
+    return handleWeatherProviderError(error, 'Unable to load weather data at this time.');
   }
 }
