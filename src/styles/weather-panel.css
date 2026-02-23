@@ -47,8 +47,3 @@
   display: grid;
   gap: 12px;
 }
-
-.weather-content-loading {
-  opacity: 0.3;
-  pointer-events: none;
-}

@@ -29,7 +29,7 @@ export const WeatherPanelSkeleton = () => {
           </div>
           <div className="current-temperature">
             <span className="current-icon weather-skeleton-icon">
-              <Skeleton circle width={80} height={80} {...skeletonProps} />
+              <Skeleton circle width={110} height={110} {...skeletonProps} />
             </span>
             <div className="skeleton-temp-placeholder">
               <Skeleton width={130} height="1em" {...skeletonProps} />
@@ -64,7 +64,7 @@ export const WeatherPanelSkeleton = () => {
                 <Skeleton width={86} {...skeletonProps} />
               </div>
               <span className="forecast-icon weather-skeleton-icon-sm">
-                <Skeleton circle width={44} height={44} {...skeletonProps} />
+                <Skeleton circle width={64} height={64} {...skeletonProps} />
               </span>
               <div className="forecast-description">
                 <Skeleton width="70%" {...skeletonProps} />

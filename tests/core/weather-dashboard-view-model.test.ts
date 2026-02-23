@@ -58,10 +58,16 @@ describe('buildWeatherDashboardViewModel', () => {
   });
 
   describe('shouldShowSkeleton', () => {
-    it('is true when isLoadingWeather is true even with existing weather', () => {
+    it('is false when weather exists even while loading (keeps stale content visible)', () => {
       const vm = buildWeatherDashboardViewModel(
         buildBaseAppState({ isLoadingWeather: true, weather: buildWeatherResponse() }),
       );
+
+      expect(vm.shouldShowSkeleton).toBe(false);
+    });
+
+    it('is true when no weather and isLoadingWeather is true', () => {
+      const vm = buildWeatherDashboardViewModel(buildBaseAppState({ isLoadingWeather: true }));
 
       expect(vm.shouldShowSkeleton).toBe(true);
     });
@@ -84,22 +90,6 @@ describe('buildWeatherDashboardViewModel', () => {
       const vm = buildWeatherDashboardViewModel(buildBaseAppState({ isSearching: true }));
 
       expect(vm.shouldShowSkeleton).toBe(true);
-    });
-  });
-
-  describe('shouldShowSkeletonAsOverlay', () => {
-    it('is true when skeleton shows and weather already exists (refresh scenario)', () => {
-      const vm = buildWeatherDashboardViewModel(
-        buildBaseAppState({ isLoadingWeather: true, weather: buildWeatherResponse() }),
-      );
-
-      expect(vm.shouldShowSkeletonAsOverlay).toBe(true);
-    });
-
-    it('is false when skeleton shows but no weather exists yet (initial load)', () => {
-      const vm = buildWeatherDashboardViewModel(buildBaseAppState({ isLoadingWeather: true }));
-
-      expect(vm.shouldShowSkeletonAsOverlay).toBe(false);
     });
   });
 

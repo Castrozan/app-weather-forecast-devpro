@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ReactNode } from 'react';
 
@@ -16,18 +15,14 @@ import { WeatherPanelSkeleton } from './WeatherPanelSkeleton';
 type WeatherMainPanelProps = {
   weatherData: WeatherResponse | null;
   weatherContentKey: string;
-  isLoadingWeather: boolean;
   shouldShowSkeleton: boolean;
-  shouldShowSkeletonAsOverlay: boolean;
   unitToggle: ReactNode;
 };
 
 export const WeatherMainPanel = ({
   weatherData,
   weatherContentKey,
-  isLoadingWeather,
   shouldShowSkeleton,
-  shouldShowSkeletonAsOverlay,
   unitToggle,
 }: WeatherMainPanelProps) => {
   return (
@@ -40,7 +35,7 @@ export const WeatherMainPanel = ({
         <AnimatePresence mode="popLayout">
           {weatherData ? (
             <motion.div
-              className={clsx('weather-content', isLoadingWeather && 'weather-content-loading')}
+              className="weather-content"
               key={weatherContentKey}
               {...weatherContentEnterAnimation}
             >
@@ -50,10 +45,7 @@ export const WeatherMainPanel = ({
           ) : null}
           {shouldShowSkeleton ? (
             <motion.div
-              className={clsx(
-                'weather-skeleton-layer',
-                shouldShowSkeletonAsOverlay && 'weather-skeleton-overlay',
-              )}
+              className="weather-skeleton-layer"
               key="skeleton"
               {...skeletonLayerEnterAnimation}
             >
