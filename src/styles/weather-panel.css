@@ -49,6 +49,6 @@
 }
 
 .weather-content-loading {
-  visibility: hidden;
+  opacity: 0.3;
   pointer-events: none;
 }

@@ -104,11 +104,11 @@ describe('buildWeatherDashboardViewModel', () => {
   });
 
   describe('weatherContentKey', () => {
-    it('includes lat, lon, temperature, and units to force remount on city or unit change', () => {
+    it('includes lat and lon to force remount on city change', () => {
       const weather = buildWeatherResponse();
       const vm = buildWeatherDashboardViewModel(buildBaseAppState({ weather }));
 
-      expect(vm.weatherContentKey).toBe('35.68,139.69,22,metric');
+      expect(vm.weatherContentKey).toBe('35.68,139.69');
     });
 
     it('returns a stable empty-state key when no weather is present', () => {

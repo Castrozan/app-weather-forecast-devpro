@@ -10,7 +10,7 @@ export type WeatherDashboardViewModel = {
 };
 
 const resolveWeatherContentKey = (weather: WeatherResponse): string => {
-  return `${weather.location.lat},${weather.location.lon},${weather.current.temperature},${weather.units}`;
+  return `${weather.location.lat},${weather.location.lon}`;
 };
 
 const resolveShouldShowSkeleton = (
