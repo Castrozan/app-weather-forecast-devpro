@@ -68,9 +68,6 @@ src/
       hooks/                      useWeatherSearch
       components/                 Sidebar, search form, candidates, unit toggle
       styles/                     Search-specific CSS
-    geolocation/                  GEOLOCATION DOMAIN
-      requestUserCoordinates.ts   Browser geolocation API
-      hooks/                      useGeolocationBootstrap
     security/                     AUTH/SECURITY DOMAIN
       accessToken.ts              Token validation
       rateLimiter.ts              In-memory rate limiter
@@ -97,18 +94,15 @@ Browser hooks (useWeatherApp)
 
 - **WeatherProviderPort** (`features/weather/providers/`) — stable interface for weather data. Adapters in `openWeather/` and `openMeteo/` are swappable. `withFallbackWeatherProvider` composes primary+fallback.
 - **Provider resolution** is a lazy singleton in `resolveWeatherProvider.ts` — OpenWeather primary with Open-Meteo fallback when `OPENWEATHER_API_KEY` is set, Open-Meteo alone otherwise.
-- **Cache key** is `lat:lon:units`. Display name (city name or "Near You") is overlaid post-cache so identical coordinates share one upstream hit.
-- **View model** (`weatherDashboardViewModel.ts`) derives UI state (`shouldShowSkeleton`, `controlsDisabled`, `weatherContentKey`) from hook state — components stay purely presentational.
-- **Geolocation bootstrap** runs once on mount with a 1.6s delay, silently cancelled if user has interacted. If permission is already granted, it loads local weather immediately and skips the default city.
-- **minimumDuration** wrapper ensures loading skeletons show for at least 500ms.
+- **Cache key** is `lat:lon:units`. Display name (city name) is overlaid post-cache so identical coordinates share one upstream hit.
+- **View model** (`weatherDashboardViewModel.ts`) derives UI state (`showLoadingSpinner`, `controlsDisabled`, `weatherContentKey`) from hook state — components stay purely presentational.
 
 ### State Management
 
-No global store. All state lives in three composable hooks assembled by `useWeatherApp`:
+No global store. All state lives in two composable hooks assembled by `useWeatherApp`:
 
 - `useWeatherLoader` — weather data, units, loading state
 - `useWeatherSearch` — city search query, candidates, selection
-- `useGeolocationBootstrap` — one-time location detection on mount
 
 ### Testing Structure
 
