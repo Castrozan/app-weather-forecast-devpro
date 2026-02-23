@@ -4,10 +4,7 @@
   margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
-  border: 1px solid var(--surface-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: rgba(7, 12, 21, 0.54);
-  backdrop-filter: blur(10px);
   box-shadow: var(--shadow-md);
 }

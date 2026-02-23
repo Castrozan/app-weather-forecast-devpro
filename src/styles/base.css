@@ -4,5 +4,5 @@ body {
   color: var(--text-main);
   font-size: 15px;
   font-family: var(--font-body), 'Noto Sans', sans-serif;
-  background: linear-gradient(140deg, #060a12 0%, var(--page-bg) 52%, #051731 100%);
+  background: var(--page-bg);
 }

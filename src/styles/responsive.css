@@ -1,12 +1,11 @@
 @media (max-width: 1080px) {
   .forecast-card {
-    flex: 0 1 calc(33.333% - 8px);
-    max-width: calc(33.333% - 8px);
+    flex: 0 1 calc(33.333% - 6px);
+    max-width: calc(33.333% - 6px);
   }
 
   .current-main {
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: center;
   }
 }
 
@@ -20,7 +19,7 @@
 
   .sidebar {
     border-right: 0;
-    border-bottom: 1px solid rgba(156, 217, 255, 0.14);
+    border-bottom: 1px solid var(--surface-border);
     gap: 18px;
   }
 
@@ -37,17 +36,12 @@
 
 @media (max-width: 760px) {
   .forecast-card {
-    flex: 0 1 calc(50% - 6px);
-    max-width: calc(50% - 6px);
-  }
-
-  .forecast-header {
-    flex-direction: column;
-    align-items: flex-start;
+    flex: 0 1 calc(50% - 5px);
+    max-width: calc(50% - 5px);
   }
 
   .current-stats {
-    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    grid-template-columns: repeat(2, minmax(100px, 1fr));
   }
 }
 
@@ -56,34 +50,32 @@
     margin: 0;
     width: 100%;
     border-radius: 0;
-    border-left: 0;
-    border-right: 0;
   }
 
   .sidebar,
   .weather-panel {
-    padding: 18px 16px;
+    padding: 16px 14px;
   }
 
   .sidebar-title {
-    font-size: clamp(34px, 10vw, 54px);
+    font-size: clamp(28px, 10vw, 42px);
   }
 
   .current-city {
-    font-size: clamp(34px, 10vw, 58px);
+    font-size: clamp(26px, 8vw, 40px);
   }
 
   .current-temp {
-    font-size: clamp(50px, 13vw, 70px);
+    font-size: clamp(36px, 10vw, 52px);
   }
 
   .current-icon {
-    width: 80px;
-    height: 80px;
+    width: 64px;
+    height: 64px;
   }
 
   .current-icon .wi {
-    font-size: 40px;
+    font-size: 32px;
   }
 
   .current-stats {

@@ -1,6 +1,4 @@
-import type { ReactNode } from 'react';
-
-import type { WeatherResponse } from '@/features/weather/types';
+import type { TemperatureUnit, WeatherResponse } from '@/features/weather/types';
 
 import { PanelDisclaimer } from './PanelDisclaimer';
 import { CurrentWeatherPanel } from './CurrentWeatherPanel';
@@ -9,13 +7,15 @@ import { ForecastGrid } from './ForecastGrid';
 type WeatherMainPanelProps = {
   weatherData: WeatherResponse | null;
   weatherContentKey: string;
-  unitToggle: ReactNode;
+  onToggleUnits: (unit: TemperatureUnit) => void;
+  controlsDisabled: boolean;
 };
 
 export const WeatherMainPanel = ({
   weatherData,
   weatherContentKey,
-  unitToggle,
+  onToggleUnits,
+  controlsDisabled,
 }: WeatherMainPanelProps) => {
   return (
     <section className="weather-panel">
@@ -26,8 +26,12 @@ export const WeatherMainPanel = ({
       <div className="weather-stage">
         {weatherData ? (
           <div className="weather-content" key={weatherContentKey}>
-            <CurrentWeatherPanel weather={weatherData} />
-            <ForecastGrid weather={weatherData} unitToggle={unitToggle} />
+            <CurrentWeatherPanel
+              weather={weatherData}
+              onToggleUnits={onToggleUnits}
+              controlsDisabled={controlsDisabled}
+            />
+            <ForecastGrid weather={weatherData} />
           </div>
         ) : null}
       </div>

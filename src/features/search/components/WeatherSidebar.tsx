@@ -24,8 +24,7 @@ export const WeatherSidebar = ({
   return (
     <aside className="sidebar">
       <header className="sidebar-header">
-        <p className="sidebar-kicker">Live Forecast</p>
-        <h1 className="sidebar-title">City Search</h1>
+        <h1 className="sidebar-title">Search</h1>
       </header>
       <SearchForm
         value={cityQuery}

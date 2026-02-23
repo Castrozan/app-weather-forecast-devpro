@@ -4,7 +4,15 @@
   margin-top: auto;
   font-size: 11px;
   line-height: 1.5;
-  color: rgba(232, 244, 255, 0.82);
-  border-top: 1px solid rgba(190, 233, 255, 0.24);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   padding-top: 12px;
+}
+
+.disclaimer--sidebar {
+  color: var(--text-side-muted);
+  border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+.disclaimer--panel {
+  color: rgba(255, 255, 255, 0.7);
 }

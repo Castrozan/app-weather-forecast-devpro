@@ -21,10 +21,10 @@ export const ForecastCard = ({ forecast, units }: ForecastCardProps) => {
       <p className="forecast-description">{forecast.description}</p>
       <div className="forecast-minmax-grid">
         <p className="forecast-minmax">
-          Min {forecast.min}°{unitSymbol}
+          L {forecast.min}°{unitSymbol}
         </p>
         <p className="forecast-minmax">
-          Max {forecast.max}°{unitSymbol}
+          H {forecast.max}°{unitSymbol}
         </p>
       </div>
     </article>

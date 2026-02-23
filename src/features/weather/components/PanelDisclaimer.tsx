@@ -2,5 +2,5 @@ const PANEL_DISCLAIMER_TEXT = `Users are advised to consult official government 
 By using this App, you agree to assume full responsibility for any decisions or actions taken based on its content.`;
 
 export const PanelDisclaimer = () => {
-  return <small className="disclaimer">{PANEL_DISCLAIMER_TEXT}</small>;
+  return <small className="disclaimer disclaimer--panel">{PANEL_DISCLAIMER_TEXT}</small>;
 };

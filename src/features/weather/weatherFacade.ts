@@ -10,11 +10,16 @@ const weekdayFormatter = new Intl.DateTimeFormat('en-US', {
   timeZone: 'UTC',
 });
 
-const mapDateToLabel = (date: string, index: number): string => {
-  if (index === 0) {
-    return 'Tomorrow';
-  }
+const resolveLocalTodayDateKey = (timezoneOffsetSeconds: number): string => {
+  const nowUtcMilliseconds = Date.now();
+  const localMilliseconds = nowUtcMilliseconds + timezoneOffsetSeconds * 1000;
+  return new Date(localMilliseconds).toISOString().slice(0, 10);
+};
 
+const mapDateToForecastLabel = (date: string, todayDateKey: string): string => {
+  if (date === todayDateKey) {
+    return 'Today';
+  }
   return weekdayFormatter.format(new Date(`${date}T00:00:00Z`));
 };
 
@@ -76,13 +81,14 @@ export const getWeatherByCoordinates = async (
     units,
   });
 
+  const todayDateKey = resolveLocalTodayDateKey(weatherData.timezoneOffsetSeconds);
   const daily = aggregateForecastByDay(
     weatherData.forecastEntries,
     weatherData.timezoneOffsetSeconds,
     5,
-  ).map((day, index) => ({
+  ).map((day) => ({
     ...day,
-    label: mapDateToLabel(day.date, index),
+    label: mapDateToForecastLabel(day.date, todayDateKey),
   }));
 
   const response: WeatherResponse = {

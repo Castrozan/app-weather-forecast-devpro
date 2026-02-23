@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { CurrentWeatherPanel } from '@/features/weather/components/CurrentWeatherPanel';
 import type { WeatherResponse } from '@/features/weather/types';
@@ -19,9 +19,17 @@ const buildMetricWeatherResponse = (): WeatherResponse => ({
   forecastDaily: [],
 });
 
+const noopToggle = vi.fn();
+
 describe('CurrentWeatherPanel', () => {
   it('renders city name, country, and description', () => {
-    render(<CurrentWeatherPanel weather={buildMetricWeatherResponse()} />);
+    render(
+      <CurrentWeatherPanel
+        weather={buildMetricWeatherResponse()}
+        onToggleUnits={noopToggle}
+        controlsDisabled={false}
+      />,
+    );
 
     expect(screen.getByText('Tokyo')).toBeInTheDocument();
     expect(screen.getByText(/JP/)).toBeInTheDocument();
@@ -29,21 +37,40 @@ describe('CurrentWeatherPanel', () => {
   });
 
   it('renders temperature with metric unit symbol', () => {
-    render(<CurrentWeatherPanel weather={buildMetricWeatherResponse()} />);
+    render(
+      <CurrentWeatherPanel
+        weather={buildMetricWeatherResponse()}
+        onToggleUnits={noopToggle}
+        controlsDisabled={false}
+      />,
+    );
 
-    expect(screen.getByText('22°C')).toBeInTheDocument();
+    expect(screen.getByText(/22°/)).toBeInTheDocument();
+    expect(screen.getByText('C')).toBeInTheDocument();
     expect(screen.getByText('18°C')).toBeInTheDocument();
     expect(screen.getByText('27°C')).toBeInTheDocument();
   });
 
   it('renders humidity percentage', () => {
-    render(<CurrentWeatherPanel weather={buildMetricWeatherResponse()} />);
+    render(
+      <CurrentWeatherPanel
+        weather={buildMetricWeatherResponse()}
+        onToggleUnits={noopToggle}
+        controlsDisabled={false}
+      />,
+    );
 
     expect(screen.getByText('65%')).toBeInTheDocument();
   });
 
   it('renders wind speed with km/h unit for metric', () => {
-    render(<CurrentWeatherPanel weather={buildMetricWeatherResponse()} />);
+    render(
+      <CurrentWeatherPanel
+        weather={buildMetricWeatherResponse()}
+        onToggleUnits={noopToggle}
+        controlsDisabled={false}
+      />,
+    );
 
     expect(screen.getByText(/14.*km\/h/)).toBeInTheDocument();
   });
@@ -53,9 +80,16 @@ describe('CurrentWeatherPanel', () => {
       ...buildMetricWeatherResponse(),
       units: 'imperial',
     };
-    render(<CurrentWeatherPanel weather={imperialWeather} />);
+    render(
+      <CurrentWeatherPanel
+        weather={imperialWeather}
+        onToggleUnits={noopToggle}
+        controlsDisabled={false}
+      />,
+    );
 
     expect(screen.getByText(/14.*mph/)).toBeInTheDocument();
-    expect(screen.getByText('22°F')).toBeInTheDocument();
+    expect(screen.getByText(/22°/)).toBeInTheDocument();
+    expect(screen.getByText('F')).toBeInTheDocument();
   });
 });
