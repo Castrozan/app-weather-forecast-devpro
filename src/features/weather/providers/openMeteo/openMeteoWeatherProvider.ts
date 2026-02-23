@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
-import { FORECAST_DAYS } from '@/config/appConfig';
+import { FORECAST_DAYS, WEATHER_API_TIMEOUT_MILLISECONDS } from '@/config/appConfig';
+
+const UPSTREAM_FETCH_TIMEOUT_MILLISECONDS = WEATHER_API_TIMEOUT_MILLISECONDS;
 import { convertUnixTimestampToLocalDateKey } from '@/features/weather/forecast/timezoneConversion';
 import { WeatherProviderUpstreamError } from '@/features/weather/providers/weatherProviderErrors';
 import type {
@@ -56,6 +58,7 @@ const fetchJson = async <T>(url: string): Promise<T> => {
       Accept: 'application/json',
     },
     cache: 'no-store',
+    signal: AbortSignal.timeout(UPSTREAM_FETCH_TIMEOUT_MILLISECONDS),
   });
 
   if (!response.ok) {

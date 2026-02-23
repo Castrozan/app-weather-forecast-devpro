@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
-import { CITY_SEARCH_RESULTS_LIMIT } from '@/config/appConfig';
+import { CITY_SEARCH_RESULTS_LIMIT, WEATHER_API_TIMEOUT_MILLISECONDS } from '@/config/appConfig';
+
+const UPSTREAM_FETCH_TIMEOUT_MILLISECONDS = WEATHER_API_TIMEOUT_MILLISECONDS;
 import {
   WeatherProviderConfigurationError,
   WeatherProviderUpstreamError,
@@ -100,6 +102,7 @@ const fetchJsonWithApiKey = async <T>(url: string, apiKey: string): Promise<T> =
       Accept: 'application/json',
     },
     cache: 'no-store',
+    signal: AbortSignal.timeout(UPSTREAM_FETCH_TIMEOUT_MILLISECONDS),
   });
 
   if (!response.ok) {
