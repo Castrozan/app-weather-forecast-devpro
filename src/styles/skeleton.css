@@ -20,7 +20,7 @@
 
 .weather-skeleton-current,
 .weather-skeleton-card {
-  border-color: #3a6f98;
+  border-color: transparent;
   background: linear-gradient(180deg, #133a5f, #0f3353);
   backdrop-filter: none;
   box-shadow: none;
@@ -28,7 +28,7 @@
 
 .weather-skeleton-icon,
 .weather-skeleton-icon-sm {
-  border-color: #3a6f98;
+  border-color: transparent;
   background: linear-gradient(180deg, #1d527d, #173f62);
   box-shadow: none;
 }
