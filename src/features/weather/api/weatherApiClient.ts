@@ -1,8 +1,13 @@
+import { WEATHER_API_TIMEOUT_MILLISECONDS } from '@/config/appConfig';
 import type { CityCandidate, TemperatureUnit, WeatherResponse } from '@/features/weather/types';
 
 type CitiesResponse = {
   query: string;
   cities: CityCandidate[];
+};
+
+const createTimeoutSignal = (): AbortSignal => {
+  return AbortSignal.timeout(WEATHER_API_TIMEOUT_MILLISECONDS);
 };
 
 const ensureOk = async (response: Response): Promise<Response> => {
@@ -27,6 +32,7 @@ export const weatherApiClient = {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ token }),
+      signal: createTimeoutSignal(),
     });
 
     await ensureOk(response);
@@ -34,7 +40,9 @@ export const weatherApiClient = {
 
   async fetchCities(query: string): Promise<CityCandidate[]> {
     const encoded = encodeURIComponent(query);
-    const response = await fetch(`/api/v1/cities?query=${encoded}`);
+    const response = await fetch(`/api/v1/cities?query=${encoded}`, {
+      signal: createTimeoutSignal(),
+    });
     const ok = await ensureOk(response);
     const payload = (await ok.json()) as CitiesResponse;
     return payload.cities;
@@ -60,7 +68,9 @@ export const weatherApiClient = {
       params.set('country', location.country);
     }
 
-    const response = await fetch(`/api/v1/weather?${params.toString()}`);
+    const response = await fetch(`/api/v1/weather?${params.toString()}`, {
+      signal: createTimeoutSignal(),
+    });
     const ok = await ensureOk(response);
     return (await ok.json()) as WeatherResponse;
   },

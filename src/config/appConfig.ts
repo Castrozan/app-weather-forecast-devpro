@@ -12,6 +12,10 @@ export const toValidatedTemperatureUnit = (input: string | undefined): Temperatu
   return 'metric';
 };
 
+export const FORECAST_DAYS = 5;
+export const CITY_SEARCH_RESULTS_LIMIT = 5;
+export const WEATHER_API_TIMEOUT_MILLISECONDS = 10_000;
+
 export const appConfig = {
   appAccessToken: process.env.APP_ACCESS_TOKEN ?? '',
   cacheTtlSeconds: toInteger(process.env.CACHE_TTL_SECONDS, 300),
