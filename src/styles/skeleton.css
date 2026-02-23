@@ -102,7 +102,6 @@
 
 .weather-skeleton-card {
   justify-items: center;
-  gap: 4px;
 }
 
 .skeleton-line-label {
@@ -119,8 +118,8 @@
 }
 
 .skeleton-line-description {
-  width: 100%;
-  height: 32px;
+  width: 70%;
+  height: 12px;
 }
 
 .weather-skeleton-minmax-grid {
@@ -129,6 +128,6 @@
 
 .weather-skeleton-minmax {
   width: 100%;
-  height: 27px;
+  height: 25px;
   border-radius: 9px;
 }
