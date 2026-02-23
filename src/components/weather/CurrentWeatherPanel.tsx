@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { Droplets, Thermometer, ThermometerSnowflake, Wind } from 'lucide-react';
 
 import { temperatureUnitSymbol, windSpeedUnitLabel } from '@/lib/weatherUnits';
+import { AnimatedValue } from '@/shared/animation/AnimatedValue';
 import type { WeatherResponse } from '@/types/weather';
 
 import { resolveWeatherIconClass } from '@/shared/icons/weatherIconClass';
@@ -11,6 +12,8 @@ type CurrentWeatherPanelProps = {
 };
 
 export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
+  const unitSymbol = temperatureUnitSymbol(weather.units);
+
   return (
     <section className="current-weather" aria-label="Current weather">
       <div className="current-main">
@@ -30,7 +33,7 @@ export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
             />
           </span>
           <p className="current-temp">
-            {weather.current.temperature}°{temperatureUnitSymbol(weather.units)}
+            <AnimatedValue value={`${weather.current.temperature}°${unitSymbol}`} />
           </p>
         </div>
       </div>
@@ -41,7 +44,7 @@ export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
             Min
           </dt>
           <dd>
-            {weather.current.min}°{temperatureUnitSymbol(weather.units)}
+            <AnimatedValue value={`${weather.current.min}°${unitSymbol}`} />
           </dd>
         </div>
         <div className="current-stat">
@@ -50,7 +53,7 @@ export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
             Max
           </dt>
           <dd>
-            {weather.current.max}°{temperatureUnitSymbol(weather.units)}
+            <AnimatedValue value={`${weather.current.max}°${unitSymbol}`} />
           </dd>
         </div>
         <div className="current-stat">
@@ -66,7 +69,9 @@ export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
             Wind
           </dt>
           <dd>
-            {weather.current.windSpeed} {windSpeedUnitLabel(weather.units)}
+            <AnimatedValue
+              value={`${weather.current.windSpeed} ${windSpeedUnitLabel(weather.units)}`}
+            />
           </dd>
         </div>
       </dl>

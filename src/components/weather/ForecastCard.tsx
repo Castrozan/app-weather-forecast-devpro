@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 
 import { temperatureUnitSymbol } from '@/lib/weatherUnits';
+import { AnimatedValue } from '@/shared/animation/AnimatedValue';
 import type { ForecastDay, TemperatureUnit } from '@/types/weather';
 import { resolveWeatherIconClass } from '@/shared/icons/weatherIconClass';
 
@@ -10,6 +11,8 @@ type ForecastCardProps = {
 };
 
 export const ForecastCard = ({ forecast, units }: ForecastCardProps) => {
+  const unitSymbol = temperatureUnitSymbol(units);
+
   return (
     <article className="forecast-card">
       <h4 className="forecast-label">{forecast.label}</h4>
@@ -19,10 +22,10 @@ export const ForecastCard = ({ forecast, units }: ForecastCardProps) => {
       <p className="forecast-description">{forecast.description}</p>
       <div className="forecast-minmax-grid">
         <p className="forecast-minmax">
-          Min {forecast.min}°{temperatureUnitSymbol(units)}
+          <AnimatedValue value={`Min ${forecast.min}°${unitSymbol}`} />
         </p>
         <p className="forecast-minmax">
-          Max {forecast.max}°{temperatureUnitSymbol(units)}
+          <AnimatedValue value={`Max ${forecast.max}°${unitSymbol}`} />
         </p>
       </div>
     </article>
