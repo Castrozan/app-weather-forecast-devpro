@@ -10,5 +10,4 @@
 @import './auth.css';
 @import '../features/dashboard/styles/error-fallback.css';
 @import '../features/weather/styles/disclaimer.css';
-@import './animations.css';
 @import './responsive.css';

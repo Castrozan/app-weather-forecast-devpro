@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import { Droplets, Thermometer, ThermometerSnowflake, Wind } from 'lucide-react';
 
 import { temperatureUnitSymbol, windSpeedUnitLabel } from '@/features/weather/units';
-import { AnimatedValue } from '@/shared/animation/AnimatedValue';
 import type { WeatherResponse } from '@/features/weather/types';
 
 import { resolveWeatherIconClass } from '@/features/weather/icons/weatherIconClass';
@@ -33,7 +32,7 @@ export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
             />
           </span>
           <p className="current-temp">
-            <AnimatedValue value={`${weather.current.temperature}°${unitSymbol}`} />
+            {weather.current.temperature}°{unitSymbol}
           </p>
         </div>
       </div>
@@ -44,7 +43,7 @@ export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
             Min
           </dt>
           <dd>
-            <AnimatedValue value={`${weather.current.min}°${unitSymbol}`} />
+            {weather.current.min}°{unitSymbol}
           </dd>
         </div>
         <div className="current-stat">
@@ -53,7 +52,7 @@ export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
             Max
           </dt>
           <dd>
-            <AnimatedValue value={`${weather.current.max}°${unitSymbol}`} />
+            {weather.current.max}°{unitSymbol}
           </dd>
         </div>
         <div className="current-stat">
@@ -69,9 +68,7 @@ export const CurrentWeatherPanel = ({ weather }: CurrentWeatherPanelProps) => {
             Wind
           </dt>
           <dd>
-            <AnimatedValue
-              value={`${weather.current.windSpeed} ${windSpeedUnitLabel(weather.units)}`}
-            />
+            {weather.current.windSpeed} {windSpeedUnitLabel(weather.units)}
           </dd>
         </div>
       </dl>

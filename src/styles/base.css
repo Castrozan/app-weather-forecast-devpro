@@ -4,36 +4,5 @@ body {
   color: var(--text-main);
   font-size: 15px;
   font-family: var(--font-body), 'Noto Sans', sans-serif;
-  background:
-    radial-gradient(circle at 10% 16%, var(--page-overlay) 0%, transparent 43%),
-    radial-gradient(circle at 82% 8%, rgba(66, 183, 239, 0.24) 0%, transparent 42%),
-    linear-gradient(140deg, #060a12 0%, var(--page-bg) 52%, #051731 100%);
-}
-
-body::before,
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-}
-
-body::before {
-  background:
-    radial-gradient(circle at 0% 60%, rgba(112, 222, 255, 0.18) 0%, transparent 55%),
-    radial-gradient(circle at 100% 100%, rgba(59, 124, 191, 0.24) 0%, transparent 45%);
-  z-index: -2;
-}
-
-body::after {
-  background-image: linear-gradient(
-    125deg,
-    rgba(255, 255, 255, 0.02) 0%,
-    rgba(255, 255, 255, 0.02) 48%,
-    transparent 49%,
-    transparent 100%
-  );
-  background-size: 9px 9px;
-  opacity: 0.35;
-  z-index: -1;
+  background: linear-gradient(140deg, #060a12 0%, var(--page-bg) 52%, #051731 100%);
 }

@@ -1,10 +1,5 @@
-import { motion } from 'framer-motion';
 import type { ReactNode } from 'react';
 
-import {
-  forecastCardEntryVariants,
-  forecastGridStaggerVariants,
-} from '@/shared/animation/variants';
 import type { WeatherResponse } from '@/features/weather/types';
 
 import { ForecastCard } from './ForecastCard';
@@ -25,18 +20,11 @@ export const ForecastGrid = ({ weather, unitToggle }: ForecastGridProps) => {
         <h3 className="forecast-title">5-Day Forecast</h3>
         {unitToggle}
       </div>
-      <motion.div
-        className="forecast-grid"
-        variants={forecastGridStaggerVariants}
-        initial="initial"
-        animate="animate"
-      >
+      <div className="forecast-grid">
         {weather.forecastDaily.map((forecast) => (
-          <motion.div key={forecast.date} variants={forecastCardEntryVariants}>
-            <ForecastCard forecast={forecast} units={weather.units} />
-          </motion.div>
+          <ForecastCard key={forecast.date} forecast={forecast} units={weather.units} />
         ))}
-      </motion.div>
+      </div>
     </section>
   );
 };
