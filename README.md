@@ -14,8 +14,8 @@ Works immediately with no API key (Open-Meteo). Set `OPENWEATHER_API_KEY` for Op
 ## Verify
 
 ```bash
-npm run verify       # format + lint + typecheck + 86 unit tests
-npm run test:e2e     # 8 Playwright browser tests (mocked APIs)
+npm run verify       # format + lint + typecheck + unit tests
+npm run test:e2e     # Playwright browser tests (mocked APIs)
 npm run build        # production build
 ```
 
@@ -27,8 +27,6 @@ npm run build        # production build
 
 **In-memory cache** — correct for single-process deploys. Interface is injectable — swap to Redis without touching the facade or routes.
 
-**No global store** — three composable hooks feed a pure view model that derives all UI state. Components are presentational. Would only add a store if state needed to cross page boundaries.
+**No global store** — two composable hooks feed a pure view model that derives all UI state. Components are presentational. Would only add a store if state needed to cross page boundaries.
 
-**Geolocation with interaction guard** — fires 1.6s after mount, silently cancelled if the user has already typed. Avoids jarring city switches while still providing local weather for passive viewers.
-
-**Post-cache location overlay** — cache key is `lat:lon:units`. Display name (searched city or "Near You") is applied after cache lookup, so identical coordinates from different paths share one upstream hit.
+**Post-cache location overlay** — cache key is `lat:lon:units`. Display name (searched city) is applied after cache lookup, so identical coordinates from different search paths share one upstream hit.

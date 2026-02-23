@@ -18,7 +18,7 @@ npm run typecheck        # tsc --noEmit
 npm run test             # Vitest unit tests (single run)
 npm run test:watch       # Vitest watch mode
 npm run test:coverage    # Vitest with V8 coverage
-npx vitest run tests/core/rate-limit-and-auth.test.ts  # Run a single test file
+npx vitest run tests/core/weather-facade-cache.test.ts  # Run a single test file
 
 npm run test:e2e         # Playwright (starts dev server on port 3001)
 npm run test:e2e:headed  # Playwright with visible browser
@@ -31,8 +31,6 @@ Next.js 16 App Router with hexagonal (ports and adapters) service layer. React 1
 **Styling:** Vanilla CSS with BEM-like classes colocated in feature `styles/` directories + global design tokens in `src/styles/tokens.css`. No Tailwind, no CSS Modules.
 
 **Icons:** `lucide-react` for UI icons, `weather-icons` CSS font for weather conditions (mapped through `features/weather/icons/weatherIconClass.ts`).
-
-**Animations:** `framer-motion` for enter/exit/stagger transitions. Config centralized in `src/shared/animation/`.
 
 **Error UX:** `sonner` toasts for non-blocking errors. `react-error-boundary` in `AppProviders` for crash recovery.
 
@@ -47,7 +45,6 @@ src/
     auth/                         Auth page
   config/                         App configuration and defaults
   shared/                         Cross-cutting utilities (no domain logic)
-    animation/                    Framer-motion (easings, variants, AnimatedValue)
     infrastructure/               Query client, in-memory cache
   styles/                         Global CSS foundation (tokens, reset, base, layout)
   features/                       Domain feature modules
@@ -70,7 +67,6 @@ src/
       styles/                     Search-specific CSS
     security/                     AUTH/SECURITY DOMAIN
       accessToken.ts              Token validation
-      rateLimiter.ts              In-memory rate limiter
       requestSecurity.ts          Request verification middleware
     dashboard/                    APP SHELL ORCHESTRATOR
       weatherDashboardViewModel.ts
@@ -85,7 +81,7 @@ src/
 ```
 Browser hooks (useWeatherApp)
   → weatherApiClient (fetch /api/v1/*)
-    → Next.js API routes (validate + rate limit + auth)
+    → Next.js API routes (validate + auth)
       → weatherFacade (cache → provider → aggregate → hint overlay)
         → WeatherProviderPort adapter (OpenWeather primary, Open-Meteo fallback)
 ```
@@ -106,7 +102,7 @@ No global store. All state lives in two composable hooks assembled by `useWeathe
 
 ### Testing Structure
 
-- `tests/core/` — pure logic (forecast aggregation, rate limiting, caching, fallback provider, view model)
+- `tests/core/` — pure logic (forecast aggregation, caching, fallback provider, view model)
 - `tests/components/` — React Testing Library renders
 - `tests/api/` — API route query parsing
 - `tests/e2e/` — Playwright with mocked external APIs via `page.route()`
