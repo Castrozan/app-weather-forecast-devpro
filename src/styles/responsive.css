@@ -77,6 +77,15 @@
     font-size: clamp(50px, 13vw, 70px);
   }
 
+  .current-icon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .current-icon .wi {
+    font-size: 40px;
+  }
+
   .current-stats {
     grid-template-columns: 1fr;
   }
